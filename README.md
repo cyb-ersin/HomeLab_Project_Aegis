@@ -70,7 +70,7 @@ Complete [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation) f
 | iMac 12,1 (32GB RAM) | Ubuntu | Primary server — Suricata + Wazuh |
 | ThinkPad X250 | Kali Linux | Attacker |
 | MacBook Pro | macOS | Management / documentation |
-| Ubuntu Laptop | Ubuntu | Secondary target |
+| MacBook Pro | Ubuntu VM | Secondary target |
 | Fritz!Box | — | Network gateway |
 
 ---
