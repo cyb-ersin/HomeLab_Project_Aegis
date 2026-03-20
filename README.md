@@ -1,4 +1,4 @@
-# homelab_AEGIS
+# homelab_Project Aegis
 
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![Series](https://img.shields.io/badge/Series-Project%20Aegis-red)
