@@ -1,35 +1,46 @@
-# Project Aegis
+# homelab_AEGIS
 
-![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
-![Type](https://img.shields.io/badge/Type-Attack%20%2F%20Defense-red)
-![Difficulty](https://img.shields.io/badge/Difficulty-Advanced-red)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
+![Series](https://img.shields.io/badge/Series-Project%20Aegis-red)
 ![IDS](https://img.shields.io/badge/IDS-Suricata-orange)
 ![SIEM](https://img.shields.io/badge/SIEM-Wazuh-blue)
-![Prereq](https://img.shields.io/badge/Prereq-homelab--foundation-lightgrey)
+![Certs](https://img.shields.io/badge/CompTIA-A%2B%20%7C%20Sec%2B-blue)
 
 ---
 
 ## About
 
-Project Aegis is an advanced attack/defense lab series building directly on [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation).
+`homelab_AEGIS` is the hands-on lab repository for **Project Aegis** — an advanced attack/defense series built on top of [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation).
 
-The series follows a fictional but realistic scenario: a **small company's SOC is built from scratch** — no existing visibility, no detection capability. Each chapter adds a layer until a full detection and response pipeline is operational.
+The scenario: a small organization with no existing security visibility. Starting from zero — no IDS, no SIEM, no incident response process. Each chapter builds one layer of the detection and response pipeline until the environment is fully instrumented.
 
-> Every lab answers a single, measurable question.  
-> Every finding is backed by log evidence.  
-> Every detection maps to MITRE ATT&CK.
+> **homelab-foundation** taught the tools.  
+> **homelab_AEGIS** puts them to work.
 
 ---
 
 ## Scenario
 
-> *A small organization has a flat network, no IDS, no SIEM, and no incident response process. An attacker has already gained initial foothold. The SOC team must build visibility, detect the intrusion, investigate it, and harden the environment — in real time.*
+> *An attacker has gained initial foothold in a flat network. The defender must build visibility from scratch — deploy IDS, integrate SIEM, detect active exploitation, investigate lateral movement, analyze forensic artifacts, and harden the environment. All in real time. All documented.*
+
+---
+
+## Stack
+
+| Role | Tool |
+|---|---|
+| IDS/IPS | Suricata |
+| SIEM | Wazuh |
+| Rule source | Emerging Threats (ET Open) |
+| Attacker | Kali Linux — Metasploit, hydra, nmap |
+| Forensics | Wireshark, Zeek |
+| Documentation | Markdown + MITRE ATT&CK mapping |
 
 ---
 
 ## Prerequisites
 
-Before starting this series, complete [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation):
+Complete [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation) first:
 
 - ✅ Lab 0 — Network Discovery
 - ✅ Lab 1 — Wireshark Traffic Analysis
@@ -38,29 +49,17 @@ Before starting this series, complete [homelab-foundation](https://github.com/cy
 
 ---
 
-## Stack
-
-| Role | Tool | Why |
-|---|---|---|
-| IDS/IPS | Suricata | Multi-threaded, JSON EVE logs, native SIEM integration |
-| SIEM | Wazuh | Open-source, active community, Suricata native support |
-| Rule source | Emerging Threats (ET) | Industry standard, updated daily |
-| Attacker | Kali Linux | Metasploit, hydra, nmap, custom payloads |
-| PCAP analysis | Wireshark + Zeek | Forensics and IOC extraction |
-
----
-
-## Lab Series
+## Chapters
 
 | # | Chapter | Scenario Question | Status |
 |---|---|---|---|
-| 01 | IDS Deployment | Can we detect a port scan and brute force in real time? | 🔜 |
-| 02 | SIEM Integration | Do Suricata alerts reach Wazuh? Can we build a dashboard? | 🔜 |
-| 03 | Exploitation & Detection | If Metasploit gets a shell — does the IDS see it? | 🔜 |
-| 04 | Lateral Movement | Can SIEM detect movement between hosts post-compromise? | 🔜 |
-| 05 | PCAP Forensics | What does C2 and infostealer traffic look like in a PCAP? | 🔜 |
-| 06 | Detection Rule Writing | Can we write a Suricata rule that catches a specific threat? | 🔜 |
-| 07 | Incident Response | Can we build a full IR timeline and harden the environment? | 🔜 |
+| 01 | [IDS Deployment](Ch01_IDS_Deployment/) | Can we detect a port scan and brute force in real time? | 🔜 |
+| 02 | [SIEM Integration](Ch02_SIEM_Integration/) | Do Suricata alerts reach Wazuh? Can we build a dashboard? | 🔜 |
+| 03 | [Exploitation & Detection](Ch03_Exploitation/) | If Metasploit gets a shell — does the IDS see it? | 🔜 |
+| 04 | [Lateral Movement](Ch04_Lateral_Movement/) | Can SIEM detect movement between hosts post-compromise? | 🔜 |
+| 05 | [PCAP Forensics](Ch05_PCAP_Forensics/) | What does C2 and infostealer traffic look like in a PCAP? | 🔜 |
+| 06 | [Detection Rule Writing](Ch06_Rule_Writing/) | Can we write a Suricata rule that catches a specific threat? | 🔜 |
+| 07 | [Incident Response](Ch07_Incident_Response/) | Can we build a full IR timeline and harden the environment? | 🔜 |
 
 ---
 
@@ -68,10 +67,10 @@ Before starting this series, complete [homelab-foundation](https://github.com/cy
 
 | Machine | OS | Role |
 |---|---|---|
-| iMac 12,1 | Ubuntu Linux | Primary lab server — Suricata + Wazuh host |
+| iMac 12,1 (32GB RAM) | Ubuntu | Primary server — Suricata + Wazuh |
 | ThinkPad X250 | Kali Linux | Attacker |
 | MacBook Pro | macOS | Management / documentation |
-| MacBook Pro VirtualBOX | Ubuntu Linux | Secondary target |
+| Ubuntu Laptop | Ubuntu | Secondary target |
 | Fritz!Box | — | Network gateway |
 
 ---
@@ -80,10 +79,9 @@ Before starting this series, complete [homelab-foundation](https://github.com/cy
 
 ```
 homelab-foundation              ✅ complete
-└── Foundations: scanning, traffic analysis,
-    WiFi security, firewall & segmentation
+└── Scanning · Traffic analysis · WiFi · Firewall
 
-project-aegis                   ← you are here
+homelab_AEGIS                   ← you are here
 ├── Ch.01  IDS Deployment        🔜
 ├── Ch.02  SIEM Integration      🔜
 ├── Ch.03  Exploitation          🔜
@@ -110,4 +108,14 @@ project-aegis                   ← you are here
 
 ---
 
-*Part of an ongoing homelab series. Building toward Junior SOC Analyst.*
+## Privacy & Ethics
+
+- All attack simulations performed on own lab network only
+- No third-party systems targeted at any stage
+- PCAP forensics performed on publicly available malware samples
+- No credentials or sensitive data included in documentation
+
+---
+
+*Started from zero. Still learning, still building.*  
+*[homelab-foundation](https://github.com/cyb-ersin/homelab-foundation) → homelab_AEGIS → ...*
