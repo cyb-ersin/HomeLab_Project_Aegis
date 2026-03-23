@@ -19,7 +19,7 @@ This chapter documents the deployment of a Suricata IDS + Wazuh SIEM stack on a 
 | Kali Laptop (physical) | Attacker | Kali Linux | 172.20.10.8 |
 | Kali VirtualBox → aegis-sentinel | Sensor Node | Ubuntu 24.04.4 LTS | 172.20.10.6 |
 
-**Network:** iPhone hotspot — 172.20.10.0/28 — all machines on same subnet.
+**Network:** Subnet: 172.20.10.0/28 — max 14 hosts — Wireless Access Point
 
 ---
 
