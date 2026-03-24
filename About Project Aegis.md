@@ -2,6 +2,8 @@
 
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![Series](https://img.shields.io/badge/Series-Project%20Aegis-red)
+![Type](https://img.shields.io/badge/Type-Attack%20%2F%20Defense-red)
+![Difficulty](https://img.shields.io/badge/Difficulty-Advanced-red)
 ![IDS](https://img.shields.io/badge/IDS-Suricata-orange)
 ![SIEM](https://img.shields.io/badge/SIEM-Wazuh-blue)
 ![Certs](https://img.shields.io/badge/CompTIA-A%2B%20%7C%20Sec%2B-blue)
