@@ -53,13 +53,13 @@ Complete [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation) f
 
 | # | Chapter | Scenario Question | Status |
 |---|---|---|---|
-| 01 | [IDS Deployment](Ch01_IDS_Deployment/) | Can we detect a port scan and brute force in real time? | 🔜 |
-| 02 | [SIEM Integration](Ch02_SIEM_Integration/) | Do Suricata alerts reach Wazuh? Can we build a dashboard? | 🔜 |
-| 03 | [Exploitation & Detection](Ch03_Exploitation/) | If Metasploit gets a shell — does the IDS see it? | 🔜 |
-| 04 | [Lateral Movement](Ch04_Lateral_Movement/) | Can SIEM detect movement between hosts post-compromise? | 🔜 |
-| 05 | [PCAP Forensics](Ch05_PCAP_Forensics/) | What does C2 and infostealer traffic look like in a PCAP? | 🔜 |
-| 06 | [Detection Rule Writing](Ch06_Rule_Writing/) | Can we write a Suricata rule that catches a specific threat? | 🔜 |
-| 07 | [Incident Response](Ch07_Incident_Response/) | Can we build a full IR timeline and harden the environment? | 🔜 |
+| 01 | IDS Deployment | Can we detect a port scan and brute force in real time? | ✅ Done |
+| 02 | Active Defense & Detection Engineering | Can we automatically block attackers and build a detection pipeline? | ✅ Done |
+| 03 | Exploitation & Detection | If Metasploit gets a shell — does the IDS see it? | 🔜 |
+| 04 | Lateral Movement | Can SIEM detect movement between hosts post-compromise? | 🔜 |
+| 05 | PCAP Forensics | What does C2 and infostealer traffic look like in a PCAP? | 🔜 |
+| 06 | Detection Rule Writing | Can we write a Suricata rule that catches a specific threat? | 🔜 |
+| 07 | Incident Response | Can we build a full IR timeline and harden the environment? | 🔜 |
 
 ---
 
@@ -82,29 +82,32 @@ homelab-foundation              ✅ complete
 └── Scanning · Traffic analysis · WiFi · Firewall
 
 homelab_AEGIS                   ← you are here
-├── Ch.01  IDS Deployment        🔜
-├── Ch.02  SIEM Integration      🔜
-├── Ch.03  Exploitation          🔜
-├── Ch.04  Lateral Movement      🔜
-├── Ch.05  PCAP Forensics        🔜
-├── Ch.06  Rule Writing          🔜
-└── Ch.07  Incident Response     🔜
+├── Ch.01  IDS Deployment                        ✅ Done
+├── Ch.02  Active Defense & Detection Engineering ✅ Done
+├── Ch.03  Exploitation                          🔜
+├── Ch.04  Lateral Movement                      🔜
+├── Ch.05  PCAP Forensics                        🔜
+├── Ch.06  Rule Writing                          🔜
+└── Ch.07  Incident Response                     🔜
 ```
 
 ---
 
-## MITRE ATT&CK Coverage (Planned)
+## MITRE ATT&CK Coverage
 
-| Tactic | Technique | ID |
-|---|---|---|
-| Reconnaissance | Network Service Discovery | T1046 |
-| Initial Access | Exploit Public-Facing Application | T1190 |
-| Execution | Command and Scripting Interpreter | T1059 |
-| Lateral Movement | Remote Services | T1021 |
-| Collection | Network Sniffing | T1040 |
-| Defense Evasion | Impair Defenses | T1562 |
-| Command & Control | Application Layer Protocol | T1071 |
-| Exfiltration | Exfiltration Over C2 Channel | T1041 |
+| Tactic | Technique | ID | Status |
+|---|---|---|---|
+| Reconnaissance | Active Scanning | T1595 | ✅ Ch.01 |
+| Credential Access | Brute Force: Password Guessing | T1110.001 | ✅ Ch.01/02 |
+| Lateral Movement | Remote Services: SSH | T1021.004 | ✅ Ch.01/02 |
+| Initial Access | Valid Accounts | T1078 | ✅ Ch.01/02 |
+| Privilege Escalation | Sudo and Sudo Caching | T1548.003 | ✅ Ch.02 |
+| Initial Access | Exploit Public-Facing Application | T1190 | 🔜 Ch.03 |
+| Execution | Command and Scripting Interpreter | T1059 | 🔜 Ch.03 |
+| Collection | Network Sniffing | T1040 | 🔜 Ch.05 |
+| Defense Evasion | Impair Defenses | T1562 | 🔜 Ch.06 |
+| Command & Control | Application Layer Protocol | T1071 | 🔜 Ch.05 |
+| Exfiltration | Exfiltration Over C2 Channel | T1041 | 🔜 Ch.05 |
 
 ---
 
@@ -112,7 +115,7 @@ homelab_AEGIS                   ← you are here
 
 - All attack simulations performed on own lab network only
 - No third-party systems targeted at any stage
-- PCAP forensics performed on publicly available malware samples
+- PCAP forensics performed on publicly available samples only
 - No credentials or sensitive data included in documentation
 
 ---
