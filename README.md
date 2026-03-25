@@ -55,8 +55,8 @@ Complete [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation) f
 
 | # | Chapter | Scenario Question | Status |
 |---|---|---|---|
-| 01 | [IDS Deployment] | Can we detect a port scan and brute force in real time? | ✅ Done |
-| 02 | [Active Defense & Detection Engineering](Ch02 — Active Defense & Detection Engineering/) | Can we automatically block attackers and build a detection pipeline? | ✅ Done |
+| 01 | IDS Deployment | Can we detect a port scan and brute force in real time? | ✅ Done |
+| 02 | Active Defense & Detection Engineering| Can we automatically block attackers and build a detection pipeline? | ✅ Done |
 | 03 | Exploitation & Detection | If Metasploit gets a shell — does the IDS see it? | 🔜 |
 | 04 | Lateral Movement | Can SIEM detect movement between hosts post-compromise? | 🔜 |
 | 05 | PCAP Forensics | What does C2 and infostealer traffic look like in a PCAP? | 🔜 |
