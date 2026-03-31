@@ -123,4 +123,4 @@ homelab_AEGIS                   ← you are here
 ---
 
 *Started from zero. Still learning, still building.*  
-*[homelab-foundation](https://github.com/cyb-ersin/homelab-foundation) → homelab_AEGIS → ...*
+*[homelab-foundation](https://github.com/cyb-ersin/HomeLab_Foundation) → homelab_AEGIS → ...*
