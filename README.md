@@ -84,13 +84,13 @@ homelab-foundation              ✅ complete
 └── Scanning · Traffic analysis · WiFi · Firewall
 
 homelab_AEGIS                   ← you are here
-├── Ch.01  IDS Deployment                        ✅ Done
-├── Ch.02  Active Defense & Detection Engineering ✅ Done
-├── Ch.03  Exploitation                          🔜
-├── Ch.04  Lateral Movement                      🔜
-├── Ch.05  PCAP Forensics                        🔜
-├── Ch.06  Rule Writing                          🔜
-└── Ch.07  Incident Response                     🔜
+├── Ch.01  IDS Deployment & First Detection     ✅
+├── Ch.02  Active Defense & Detection Eng.      ✅
+├── Ch.03  Network Forensics & PCAP Analysis    🔄 (jetzt)
+├── Ch.04  Exploitation & Detection             🔜
+├── Ch.05  Lateral Movement                     🔜
+├── Ch.06  Detection Rule Writing               🔜
+└── Ch.07  Incident Response                    🔜
 ```
 
 ---
