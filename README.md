@@ -54,14 +54,14 @@ Complete [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation) f
 ## Chapters
 
 | # | Chapter | Scenario Question | Status |
-|---|---|---|---|
-| 01 | IDS Deployment | Can we detect a port scan and brute force in real time? | ✅ Done |
-| 02 | Active Defense & Detection Engineering| Can we automatically block attackers and build a detection pipeline? | ✅ Done |
-| 03 | Exploitation & Detection | If Metasploit gets a shell — does the IDS see it? | 🔜 |
-| 04 | Lateral Movement | Can SIEM detect movement between hosts post-compromise? | 🔜 |
-| 05 | PCAP Forensics | What does C2 and infostealer traffic look like in a PCAP? | 🔜 |
-| 06 | Detection Rule Writing | Can we write a Suricata rule that catches a specific threat? | 🔜 |
-| 07 | Incident Response | Can we build a full IR timeline and harden the environment? | 🔜 |
+|:--|:--------|:------------------|:-------|
+| 01 | [IDS Deployment & First Detection](Ch01_IDS_Deployment/) | Can we detect a port scan and brute force in real time? | ✅ Complete |
+| 02 | [Active Defense & Detection Engineering](Ch02_Active_Defense/) | Can we automatically block an attacker — and detect it in the SIEM? | ✅ Complete |
+| 03 | Network Forensics & PCAP Analysis | What does the attack look like on packet level? Can we reconstruct the timeline? | 🔄 In Progress |
+| 04 | Exploitation & Detection | If Metasploit gets a shell — does the IDS see it? | 🔜 Planned |
+| 05 | Lateral Movement | Can SIEM detect movement between hosts post-compromise? | 🔜 Planned |
+| 06 | Detection Rule Writing | Can we write a Suricata rule that catches a specific threat? | 🔜 Planned |
+| 07 | Incident Response | Can we build a full IR timeline and harden the environment? | 🔜 Planned |
 
 ---
 
