@@ -1,26 +1,26 @@
 # 03 — Attack Scenario
 
-## Übersicht
+## Overview
 
-Vier Angriffe wurden von Kali (192.168.178.129) gegen aegis-sentinel (192.168.178.126) ausgeführt, während `tcpdump` alles aufnahm.
+Four attacks were executed from Kali (192.168.178.129) against aegis-sentinel (192.168.178.126) while `tcpdump` captured all traffic.
 
 ---
 
-## Angriff 1 — nmap SYN Scan
+## Attack 1 — nmap SYN Scan
 
 ```bash
 sudo nmap -sS -A -T4 192.168.178.126
 ```
 
-| Flag | Bedeutung |
-|:-----|:----------|
-| `-sS` | SYN Scan — schickt nur SYN, wartet auf Antwort, sendet kein ACK |
-| `-A` | Aggressiv — OS, Version, Traceroute |
-| `-T4` | Schnell |
+| Flag | Meaning |
+|:-----|:--------|
+| `-sS` | SYN scan — sends SYN only, never completes TCP handshake |
+| `-A` | Aggressive — OS detection, version detection, traceroute |
+| `-T4` | Fast timing |
 
-**Ergebnis:**
+**Result:**
 
-![nmap SYN Scan](1.png)
+![nmap SYN Scan Output](1.png)
 
 ```
 PORT   STATE  SERVICE  VERSION
@@ -32,57 +32,58 @@ OS: Linux 4.15-5.19
 
 ---
 
-## Angriff 2 — nmap OS Fingerprinting
+## Attack 2 — nmap OS Fingerprinting
 
 ```bash
 sudo nmap -O 192.168.178.126
 ```
 
-**Ergebnis:**
+**Result:**
 
-![nmap OS Fingerprinting](4.png)
+![nmap OS Fingerprinting Output](4.png)
 
-**Besonderheit:** nmap schickt absichtlich unmögliche Flag-Kombinationen (`FIN+SYN+PSH+URG`) — im PCAP sofort erkennbar.
+**Key forensic artifact:** nmap sends impossible flag combinations (`FIN+SYN+PSH+URG`) to fingerprint the OS — immediately visible in PCAP.
 
 **MITRE:** T1595 — Active Scanning
 
 ---
 
-## Angriff 3 — nmap Service Version Detection
+## Attack 3 — nmap Service Version Detection
 
 ```bash
 sudo nmap -sV 192.168.178.126
 ```
 
-**Ergebnis:**
+**Result:**
 
-![nmap Service Detection](5.png)
+![nmap Service Detection Output](5.png)
 
 ```
 22/tcp open ssh OpenSSH 9.6p1 Ubuntu 3ubuntu13.15
 ```
 
-**Besonderheit:** nmap liest den SSH Banner und identifiziert sich dabei selbst als `SSH-2.0-NmapNSE` — im PCAP sichtbar.
+**Key forensic artifact:** nmap reads the SSH banner and identifies itself as `SSH-2.0-NmapNSE` — visible in cleartext inside the PCAP.
 
 **MITRE:** T1595 — Active Scanning
 
 ---
 
-## Angriff 4 — Hydra SSH Brute Force
+## Attack 4 — Hydra SSH Brute Force
 
 ```bash
 hydra -l aegis-siem -P /tmp/rockyou_9800.txt ssh://192.168.178.126
 ```
 
-**Ergebnis:**
+**Result:**
 
-![Hydra Brute Force](3.png)
+![Hydra Brute Force Success](3.png)
 
 ```
 [22][ssh] host: 192.168.178.126   login: aegis-siem   password: 1111 ✅
+1 of 1 target successfully completed
 ```
 
-**Hinweis:** fail2ban aus Ch.02 war noch aktiv — hat Kali nach 5 Versuchen geblockt. Deshalb mussten wir zuerst die Blockierung aufheben:
+**Note:** fail2ban from Ch.02 was still active — blocked Kali after 5 attempts. Required reset before running:
 
 ```bash
 sudo iptables -F
@@ -95,8 +96,8 @@ sudo fail2ban-client unban --all
 
 ## MITRE ATT&CK Kill Chain
 
-| Phase | Technik | ID | Tool |
-|:------|:--------|:---|:-----|
+| Phase | Technique | ID | Tool |
+|:------|:----------|:---|:-----|
 | Reconnaissance | Active Scanning | T1595 | nmap -sS |
 | Reconnaissance | Active Scanning | T1595 | nmap -O |
 | Reconnaissance | Active Scanning | T1595 | nmap -sV |

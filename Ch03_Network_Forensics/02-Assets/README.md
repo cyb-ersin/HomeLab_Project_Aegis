@@ -2,37 +2,37 @@
 
 ## Tools
 
-| Tool | Version | Maschine | Rolle |
-|:-----|:--------|:---------|:------|
-| tcpdump | 4.99.x | aegis-sentinel | Pakete aufnehmen |
-| Wireshark | 4.x | MacBook Pro | PCAP analysieren |
+| Tool | Version | Machine | Role |
+|:-----|:--------|:--------|:-----|
+| tcpdump | 4.99.x | aegis-sentinel | Live packet capture |
+| Wireshark | 4.x | MacBook Pro | Offline PCAP analysis |
 | nmap | 7.98 | Kali Laptop | Reconnaissance |
-| Hydra | 9.6 | Kali Laptop | SSH Brute Force |
+| Hydra | 9.6 | Kali Laptop | SSH brute force |
 
 ---
 
-## PCAP Datei
+## PCAP File
 
-| Eigenschaft | Wert |
-|:------------|:-----|
-| Dateiname | ch03_full.pcap |
-| Größe | ~1.9 MB |
-| Pakete gesamt | 8936 |
-| Dauer | ~650 Sekunden |
+| Property | Value |
+|:---------|:------|
+| Filename | ch03_full.pcap |
+| Size | ~1.9 MB |
+| Total packets | 8936 |
+| Duration | ~650 seconds |
 | Interface | enp0s3 |
 
 ---
 
-## Passwortliste
+## Password List
 
-Das Passwort `111` steht in rockyou.txt auf **Zeile 9845**:
+The password `111` is at **line 9845** in rockyou.txt:
 
 ```bash
 grep -n "^111$" /usr/share/wordlists/rockyou.txt
 # Output: 9845
 ```
 
-Wir haben eine kleinere Liste ab Zeile 9800 erstellt damit Hydra schnell findet:
+A smaller list was created starting from line 9800 so Hydra finds it quickly:
 
 ```bash
 tail -n +9800 /usr/share/wordlists/rockyou.txt > /tmp/rockyou_9800.txt
@@ -40,16 +40,16 @@ tail -n +9800 /usr/share/wordlists/rockyou.txt > /tmp/rockyou_9800.txt
 
 ---
 
-## Wireshark Filter
+## Wireshark Filters Used
 
-| Filter | Was er zeigt | Ergebnis |
-|:-------|:-------------|:---------|
-| `tcp.flags.syn == 1 && tcp.flags.ack == 0` | nmap SYN Scan | 3074 Pakete |
-| `tcp.port == 22 && tcp.flags.syn == 1` | SSH SYN Pakete | 134 Pakete |
-| `tcp.port == 22` | Gesamter SSH Traffic | 2191 Pakete |
-| `ip.addr == 192.168.178.129` | Angreifer Traffic | 7970 Pakete (89.2%) |
-| `tcp.port == 22 && tcp.len > 100` | Große SSH Pakete | 123 Pakete |
-| `tcp.stream eq 1017` | nmap SSH Stream | 14 Pakete |
+| Filter | What it shows | Result |
+|:-------|:-------------|:-------|
+| `tcp.flags.syn == 1 && tcp.flags.ack == 0` | nmap SYN scan packets | 3074 pkts (34.4%) |
+| `tcp.port == 22 && tcp.flags.syn == 1` | SSH SYN packets only | 134 pkts (1.5%) |
+| `tcp.port == 22` | All SSH traffic | 2191 pkts (24.5%) |
+| `ip.addr == 192.168.178.129` | All attacker traffic | 7970 pkts (89.2%) |
+| `tcp.port == 22 && tcp.len > 100` | Large SSH packets | 123 pkts (1.4%) |
+| `tcp.stream eq 1017` | nmap SSH stream isolated | 14 pkts |
 
 ---
 

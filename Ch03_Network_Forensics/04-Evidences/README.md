@@ -1,73 +1,70 @@
 # 04 — Evidences
 
-## EV-01 — nmap SYN Scan im PCAP
+## EV-01 — nmap SYN Scan Detected
 
 **Filter:** `tcp.flags.syn == 1 && tcp.flags.ack == 0`  
-**Ergebnis:** 3074 Pakete (34.4%)
+**Result:** 3074 packets (34.4%)
 
-![nmap SYN Scan Pakete](Bildschirmfoto%202026-04-11%20um%2013.19.56.png)
+![nmap SYN Scan](Bildschirmfoto%202026-04-11%20um%2013.19.56.png)
 
-**Was wir sehen:**
-- Source: `192.168.178.129` (Kali) → alle Pakete kommen vom Angreifer
-- `Win=1024` → nmap Fingerabdruck! Normaler Traffic hat `Win=64240`
-- SYN Pakete an hunderte verschiedene Ports in Millisekunden → Port Scan
+**What we see:**
+- Source `192.168.178.129` (Kali) → all packets from the attacker
+- `Win=1024` → nmap fingerprint! Normal traffic uses `Win=64240`
+- SYN packets to hundreds of different ports in milliseconds → port scan confirmed
 
 ---
 
 ## EV-02 — Win=1024 vs Win=64240
 
-![Win Size Vergleich](Bildschirmfoto%202026-04-11%20um%2013.23.06.png)
+![Win Size Comparison](Bildschirmfoto%202026-04-11%20um%2013.23.06.png)
 
-**Zwei verschiedene Muster:**
+Two distinct patterns side by side:
 
-| Win Size | Tool | Bedeutung |
-|:---------|:-----|:----------|
-| `Win=1024` | nmap | Halb-offene Verbindung, kein echter Transfer |
-| `Win=64240` | Hydra | Echte Verbindung, Daten werden übertragen |
+| Win Size | Tool | What it means |
+|:---------|:-----|:--------------|
+| `Win=1024` | nmap | Half-open scan — no real data transfer intended |
+| `Win=64240` | Hydra | Real connection — data will be exchanged |
 
 ---
 
-## EV-03 — SSH Traffic auf Port 22
+## EV-03 — SSH Traffic on Port 22
 
 **Filter:** `tcp.port == 22 && tcp.flags.syn == 1`  
-**Ergebnis:** 134 Pakete (1.5%)
+**Result:** 134 packets (1.5%)
 
-![SSH SYN Pakete](Bildschirmfoto%202026-04-11%20um%2013.29.15.png)
+![SSH SYN Packets](Bildschirmfoto%202026-04-11%20um%2013.29.15.png)
 
-**Was wir sehen:**
-- `Win=1024` Pakete → nmap scannt Port 22
-- `Win=64240` Pakete → Hydra baut echte SSH Verbindungen auf
-- Rote Zeilen `[FIN, SYN, PSH, URG]` → nmap OS Fingerprinting Probe
+**What we see:**
+- `Win=1024` packets → nmap probing Port 22
+- `Win=64240` packets → Hydra building real SSH connections
+- Red lines `[FIN, SYN, PSH, URG]` → nmap OS fingerprinting probe — impossible in normal traffic
 
 ---
 
-## EV-04 — Gesamter SSH Traffic
+## EV-04 — All SSH Traffic
 
 **Filter:** `tcp.port == 22`  
-**Ergebnis:** 2191 Pakete (24.5%)
+**Result:** 2191 packets (24.5%)
 
-![Gesamter SSH Traffic](Bildschirmfoto%202026-04-11%20um%2013.36.55.png)
+![All SSH Traffic](Bildschirmfoto%202026-04-11%20um%2013.36.55.png)
 
-**Wichtig:** Hier sehen wir zwei verschiedene Quellen:
-- `192.168.178.122` (MacBook) → legitime SSH Admin Session
-- `192.168.178.129` (Kali) → Angriff
+Two sources visible:
+- `192.168.178.122` (MacBook) → legitimate admin SSH session
+- `192.168.178.129` (Kali) → attack traffic
 
-tcpdump nimmt **alles** auf — auch eigene Verbindungen!
+tcpdump captures **everything** — including your own connections. Analyst context is required to separate them.
 
 ---
 
-## EV-05 — MacBook SSH Session entdeckt
+## EV-05 — MacBook SSH Session Identified
 
 ![MacBook SSH Session](Bildschirmfoto%202026-04-11%20um%2013.38.08.png)
 
-`192.168.178.122` ist das MacBook — keine Bedrohung. Als SOC Analyst muss man Kontext kennen um legitimen Traffic von Angriffen zu unterscheiden.
+`192.168.178.122` is the MacBook — not a threat. A SOC analyst must know the environment to separate legitimate from malicious traffic.
 
 ---
 
 ## EV-06 — nmap SSH Banner (Smoking Gun)
-
-**Filter:** `tcp.port == 22`  
-**Zeilen 2394-2395:**
 
 ![nmap SSH Banner](Bildschirmfoto%202026-04-11%20um%2013.55.14.png)
 
@@ -77,57 +74,59 @@ Client: Protocol (SSH-1.5-Nmap-SSH1-Hostkey)
 Server: Protocol (SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.15)
 ```
 
-nmap identifiziert sich im Klartext! Ein SOC Analyst sieht `NmapNSE` und weiß sofort: das ist kein echter SSH Client.
+nmap identifies itself in **cleartext**. A SOC analyst seeing `NmapNSE` immediately knows: this is not a real SSH client.
 
 ---
 
-## EV-07 — Angreifer IP isoliert
+## EV-07 — Attacker IP Isolated
 
 **Filter:** `ip.addr == 192.168.178.129`  
-**Ergebnis:** 7970 Pakete (89.2%)
+**Result:** 7970 packets (89.2%)
 
-![Angreifer Traffic](Bildschirmfoto%202026-04-11%20um%2013.56.01.png)
+![Attacker Traffic](Bildschirmfoto%202026-04-11%20um%2013.56.01.png)
 
-89% des gesamten Traffics kam vom Angreifer — eindeutig kein normales Verhalten.
-
----
-
-## EV-08 — OS Fingerprinting Pakete
-
-![OS Fingerprinting](Bildschirmfoto%202026-04-11%20um%2013.56.48.png)
-
-**Rote Zeilen:**
-```
-[RST] Win=0   → aegis-sentinel blockt die Verbindung (fail2ban!)
-```
-
-**ICMP Zeilen:**
-```
-Echo request ttl=40  → nmap pingt zuerst ob Host erreichbar
-Echo reply   ttl=64  → Host antwortet
-```
-
-**UDP Zeile:**
-```
-ICMP Destination unreachable → Port existiert nicht
-```
+89% of all captured traffic came from the attacker — clearly not normal behavior.
 
 ---
 
-## EV-09 — nmap Stream isoliert
+## EV-08 — OS Fingerprinting + RST Packets
+
+![OS Fingerprinting and RST](Bildschirmfoto%202026-04-11%20um%2013.56.48.png)
+
+**Red lines — RST packets:**
+```
+[RST] Win=0  → aegis-sentinel is blocking the connection (fail2ban from Ch.02!)
+```
+
+**ICMP lines:**
+```
+Echo request ttl=40  → nmap checks if host is alive
+Echo reply   ttl=64  → host responds
+```
+
+**UDP line:**
+```
+ICMP Destination unreachable → port does not exist
+```
+
+---
+
+## EV-09 — nmap SSH Stream Isolated
 
 **Filter:** `tcp.stream eq 1017`
 
 ![nmap Stream](Bildschirmfoto%202026-04-11%20um%2014.08.48.png)
 
-Komplette nmap SSH Verbindung in einer Ansicht:
+Complete nmap SSH connection in one view:
 ```
-SYN → Verbindung anfragen
-SYN-ACK → Port offen!
+SYN          → connect request
+SYN-ACK      → port is open!
 Server Banner → OpenSSH 9.6p1 Ubuntu
-Client Banner → SSH-2.0-NmapNSE ← Angreifer identifiziert!
-FIN → sofort wieder getrennt
+Client Banner → SSH-2.0-NmapNSE ← attacker identified!
+FIN          → immediately disconnects
 ```
+
+nmap only needed the banner — connected and left in ~30ms.
 
 ---
 
@@ -135,71 +134,70 @@ FIN → sofort wieder getrennt
 
 ![Follow Stream](Bildschirmfoto%202026-04-11%20um%2014.11.54.png)
 
-nmap liest alle unterstützten Cipher Suites des Servers — vollständige Aufklärung der Verschlüsselungskonfiguration.
+nmap reads all supported cipher suites from the server — complete encryption configuration exposed during reconnaissance.
 
 ---
 
-## EV-11 — Hydra Brute Force Muster
+## EV-11 — Hydra Brute Force Pattern
 
 **Filter:** `tcp.port == 22 && tcp.len > 100`  
-**Ergebnis:** 123 Pakete (1.4%)
+**Result:** 123 packets (1.4%)
 
-![Hydra Key Exchange Muster](Bildschirmfoto%202026-04-11%20um%2014.33.01.png)
+![Hydra Key Exchange Pattern](Bildschirmfoto%202026-04-11%20um%2014.33.01.png)
 
-**Oben (wiederholend):**
+**Top section (repeating):**
 ```
-Key Exchange Init (1042 bytes)  ← ein Passwortversuch
-ECDH Reply (558 bytes)          ← Verbindung fehlgeschlagen
-Key Exchange Init (1042 bytes)  ← nächster Versuch
-...
-```
-
-**Unten (einmalig):**
-```
-Encrypted packet (len=628)  ← großes Paket!
-Encrypted packet (len=528)  ← aktive Session!
+Key Exchange Init (1042 bytes)  ← one password attempt
+ECDH Reply (558 bytes)          ← attempt failed
+Key Exchange Init (1042 bytes)  ← next attempt...
 ```
 
-→ Das Passwort wurde gefunden!
+**Bottom section (unique):**
+```
+Encrypted packet (len=628)  ← large packet!
+Encrypted packet (len=528)  ← active session!
+```
+
+→ Password was found — active SSH session established.
 
 ---
 
-## EV-12 — Erfolgreicher Login bewiesen
+## EV-12 — Successful Login Confirmed
 
-![Erfolgreicher Login](Bildschirmfoto%202026-04-11%20um%2014.40.29.png)
+![Successful Login](Bildschirmfoto%202026-04-11%20um%2014.40.29.png)
 
-Nach hunderten kurzen Verbindungen plötzlich eine **lange verschlüsselte Session** — Hydra ist eingeloggt. Beweisbar nur aus dem PCAP, ohne Hydra Terminal Output.
+After hundreds of short connections, suddenly a **long encrypted session** appears. Hydra is logged in. Provable from PCAP alone — no Hydra terminal output required.
 
 ---
 
-## EV-13 — Conversations — 3076 TCP
+## EV-13 — TCP Conversations — 3076 Total
 
-**Menü:** Statistics → Conversations → TCP
+**Menu:** Statistics → Conversations → TCP
 
 ![TCP Conversations](Bildschirmfoto%202026-04-11%20um%2014.49.03.png)
 
-**3076 TCP Verbindungen** — davon:
-- Viele Ports, je 1 Verbindung → nmap Port Scan
-- Port 22, viele Verbindungen → Hydra Brute Force
-- Port 22, große Datenpakete → erfolgreicher Login
+**3076 TCP connections — breakdown:**
+- Many ports, 1 connection each → nmap port scan (T1595)
+- Port 22, many short connections → Hydra brute force (T1110)
+- Port 22, large data exchange → successful login (T1078)
 
 ---
 
-## EV-14 — I/O Graph — Angriffs-Timeline
+## EV-14 — I/O Graph — Full Attack Timeline
 
-**Menü:** Statistics → I/O Graph
+**Menu:** Statistics → I/O Graph
 
 ![I/O Graph Timeline](Bildschirmfoto%202026-04-11%20um%2015.15.53.png)
 
 ```
-T+60s   → Peak 1 (2000 pkt/s) → nmap -sS    SYN Scan
-T+100s  → Peak 2 (2000 pkt/s) → nmap -O     OS Fingerprinting
-T+120s  → Peak 3 (2000 pkt/s) → nmap -sV    Service Detection
-T+200s  → Peak 4 ( 350 pkt/s) → Hydra       Brute Force
-T+390s  → Rote Zone (TCP Errors) → fail2ban  Kali geblockt!
+T+60s   → Peak 1 (~2000 pkt/s) → nmap -sS    SYN Scan
+T+100s  → Peak 2 (~2000 pkt/s) → nmap -O     OS Fingerprinting
+T+120s  → Peak 3 (~2000 pkt/s) → nmap -sV    Service Detection
+T+200s  → Peak 4 ( ~350 pkt/s) → Hydra       SSH Brute Force
+T+390s  → Red zone (TCP Errors) → fail2ban    Kali blocked!
 ```
 
-Der gesamte Angriff rekonstruiert — **ohne SIEM, ohne Logs, nur aus Paketen.**
+The entire attack timeline reconstructed — **no SIEM, no logs, packets only.**
 
 ---
 

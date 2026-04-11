@@ -4,41 +4,42 @@
 
 | # | Finding | Status |
 |:--|:--------|:-------|
-| 1 | Angriff komplett aus PCAP rekonstruiert — ohne SIEM | ✅ Bewiesen |
-| 2 | nmap durch `Win=1024` eindeutig identifizierbar | ✅ Dokumentiert |
-| 3 | nmap durch SSH Banner `SSH-2.0-NmapNSE` im Klartext sichtbar | ✅ Dokumentiert |
-| 4 | Erfolgreicher Login durch große Paketgrößen beweisbar | ✅ Bestätigt |
-| 5 | fail2ban aus Ch.02 war noch aktiv — hat Kali nach 5 Versuchen geblockt | ✅ Defense-in-Depth funktioniert |
-| 6 | MacBook SSH Session im PCAP sichtbar — Analyst-Kontext notwendig | ⚠️ Erwartet |
-| 7 | ufw auf Kali hatte `policy DROP` — scp vom MacBook blockiert | ✅ Gelöst |
+| 1 | Full attack reconstructed from PCAP — no SIEM required | ✅ Proven |
+| 2 | nmap fingerprinted via `Win=1024` window size | ✅ Documented |
+| 3 | nmap identified via SSH banner `SSH-2.0-NmapNSE` in cleartext | ✅ Documented |
+| 4 | Successful login confirmed via encrypted packet size shift | ✅ Confirmed |
+| 5 | fail2ban from Ch.02 still active — blocked Kali after 5 attempts | ✅ Defense-in-depth working |
+| 6 | MacBook SSH session captured alongside attack traffic | ⚠️ Expected — context required |
+| 7 | ufw on Kali had `policy DROP` — blocked scp from MacBook | ✅ Resolved |
+| 8 | iptables rules from Ch.02 persisted across sessions | ✅ Documented |
 
 ---
 
-## Fehler & Lösungen
+## Errors & Solutions
 
-### Fehler 1 — tcpdump Syntax Error
+### Error 1 — tcpdump Syntax Error
 
-**Problem:**
+**Symptom:**
 ```
 tcpdump: can't parse filter expression: syntax error
 ```
 
-**Ursache:** Copy-Paste hat unsichtbare Sonderzeichen eingefügt.
+**Cause:** Copy-paste introduced invisible special characters.
 
-**Lösung:** Befehl manuell eintippen:
+**Solution:** Type the command manually:
 ```bash
 sudo tcpdump -i enp0s3 -w /tmp/ch03_full.pcap
 ```
 
 ---
 
-### Fehler 2 — Hydra findet Passwort nicht
+### Error 2 — Hydra Skipped Correct Password
 
-**Problem:** Hydra hat `111` (Zeile 9845) übersprungen obwohl es richtig war.
+**Symptom:** Hydra ran through the list but skipped `111` (line 9845).
 
-**Ursache:** fail2ban aus Ch.02 war noch aktiv. Nach 5 Versuchen wurde Kali geblockt — Hydra bekam `Connection refused` und interpretierte das als falsches Passwort.
+**Cause:** fail2ban from Ch.02 was still active. After 5 failed attempts Kali's IP was blocked — Hydra received `Connection refused` for every subsequent attempt including the correct password, and treated it as a wrong credential.
 
-**Lösung:**
+**Solution:**
 ```bash
 sudo iptables -F
 sudo fail2ban-client unban --all
@@ -48,48 +49,50 @@ hydra -l aegis-siem -P /tmp/rockyou_9800.txt ssh://192.168.178.126
 
 ---
 
-### Fehler 3 — scp vom MacBook funktioniert nicht
+### Error 3 — scp Connection Timeout from MacBook
 
-**Problem:**
+**Symptom:**
 ```
 ssh: connect to host 192.168.178.129 port 22: Operation timed out
 ```
 
-**Ursache:** ufw auf Kali hatte `Chain INPUT (policy DROP)` — alle eingehenden Verbindungen geblockt.
+**Cause:** ufw on Kali had `Chain INPUT (policy DROP)` — blocking all incoming connections.
 
-**Lösung:**
+**Solution:**
 ```bash
-sudo ufw disable   # auf Kali
+sudo ufw disable   # on Kali
 ```
 
 ---
 
-## Was haben wir gelernt?
+## Key Takeaways
 
-**Network Forensics funktioniert ohne SIEM.** Der vollständige Angriff — Reconnaissance, Brute Force und erfolgreicher Login — wurde nur aus Netzwerkpaketen rekonstruiert.
+**Network forensics works without a SIEM.** The complete attack — reconnaissance, brute force, and successful login — was reconstructed from raw packet data alone. No Wazuh, no Suricata, no system logs.
 
-**nmap hinterlässt eindeutige Spuren.** `Win=1024` und `SSH-2.0-NmapNSE` sind unverwechselbare Fingerabdrücke. Ein SOC Analyst erkennt nmap sofort.
+**nmap leaves obvious fingerprints.** `Win=1024` and `SSH-2.0-NmapNSE` are unmistakable signatures. A SOC analyst seeing either can confirm nmap with certainty.
 
-**Paketgröße verrät den Inhalt.** Auch in verschlüsseltem Traffic zeigt die Paketgröße das Verhalten — viele kleine Pakete = Brute Force, plötzlich große Pakete = aktive Session.
+**Packet size reveals behavior.** Even in encrypted traffic, packet size and timing tells the story. Repeated small Key Exchange packets = brute force. Sudden large encrypted packets = active session.
 
-**Defense-in-Depth hat Zeitwirkung.** fail2ban Regeln aus Ch.02 wirkten in Ch.03 weiter — Sicherheitsmaßnahmen persistieren über Vorfälle hinaus.
+**Defense-in-depth has temporal reach.** Ch.02 fail2ban rules actively impacted Ch.03 — security controls persist and layer across incidents over time.
 
-**tcpdump nimmt alles auf.** Keine Filter beim Aufnehmen — erst in Wireshark filtern. Fehlende Pakete können nicht mehr rekonstruiert werden.
+**Capture everything, filter later.** No filter at capture time = complete evidence. Apply filters in Wireshark for analysis. Missing packets cannot be recovered.
+
+**Context separates signal from noise.** The MacBook SSH session appeared alongside attack traffic. Without knowing the environment, it could be misidentified. Analyst context is essential.
 
 ---
 
-## Verbindung zu Ch.04
+## Connection to Ch.04
 
-Ch.03 hat bewiesen dass Angriffstraffic forensisch sichtbar und identifizierbar ist.
+Ch.03 proved that attack traffic is forensically visible and identifiable from packets alone.
 
-Die offene Frage: **Können wir Exploitation in Echtzeit erkennen?**
+The open question: **can we detect exploitation in real time?**
 
-Ch.04 — Exploitation & Detection:
-- Metasploit Shell gegen aegis-sentinel
-- Erkennt Suricata eine Reverse Shell?
-- Kann Wazuh Exploit + Post-Exploitation korrelieren?
+**Ch.04 — Exploitation & Detection:**
+- Metasploit shell against aegis-sentinel
+- Does Suricata detect a reverse shell?
+- Can Wazuh correlate exploit + post-exploitation activity?
 
-> Forensics zeigt was passiert ist. Detection verhindert dass es nochmal passiert.
+> Forensics shows what happened. Detection prevents it from happening again.
 
 ---
 

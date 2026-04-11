@@ -1,39 +1,39 @@
 # 01 — Architecture
 
-## Netzwerk Topologie
+## Network Topology
 
-![Lab Topologie](topology.svg)
+![Lab Topology](topology.svg)
 
 ---
 
-## Lab Umgebung
+## Lab Environment
 
-| Maschine | Rolle | OS | IP |
-|:---------|:------|:---|:---|
-| MacBook Pro | Wireshark Analyse | macOS | 192.168.178.122 |
-| Kali Laptop | Angreifer | Kali Linux | 192.168.178.129 |
+| Machine | Role | OS | IP |
+|:--------|:-----|:---|:---|
+| MacBook Pro | Wireshark Analysis | macOS | 192.168.178.122 |
+| Kali Laptop | Attacker | Kali Linux | 192.168.178.129 |
 | aegis-sentinel VM | Capture Node | Ubuntu 24.04.4 LTS | 192.168.178.126 |
 
-**Netzwerk:** Wireless Access Point · 192.168.178.0/24  
-**Hinweis:** IP hat sich gegenüber Ch.01/02 geändert (vorher 172.20.10.0/28). Wazuh wird in diesem Chapter nicht benötigt.
+**Network:** Wireless Access Point · 192.168.178.0/24  
+**Note:** IP range changed from Ch.01/02 (172.20.10.0/28) — new network session. Wazuh not required for this chapter.
 
 ---
 
 ## Capture Setup
 
-`tcpdump` wurde auf aegis-sentinel gestartet **bevor** der Angriff begann:
+`tcpdump` was started on aegis-sentinel **before** the attack began:
 
 ```bash
 sudo tcpdump -i enp0s3 -w /tmp/ch03_full.pcap
 ```
 
-| Flag | Bedeutung |
-|:-----|:----------|
-| `-i enp0s3` | Interface auf dem gelauscht wird |
-| `-w /tmp/ch03_full.pcap` | Pakete in Datei schreiben (für Offline-Analyse) |
-| kein Filter | Alles aufnehmen — filtern später in Wireshark |
+| Flag | Meaning |
+|:-----|:--------|
+| `-i enp0s3` | Listen on this interface |
+| `-w /tmp/ch03_full.pcap` | Write packets to file for offline analysis |
+| no filter | Capture everything — filter later in Wireshark |
 
-**Ergebnis:**
+**Result:**
 ```
 tcpdump: listening on enp0s3, link-type EN10MB
 8936 packets captured
@@ -43,15 +43,15 @@ tcpdump: listening on enp0s3, link-type EN10MB
 
 ---
 
-## PCAP Übertragung
+## PCAP Transfer
 
-Nach dem Angriff wurde die PCAP Datei per `scp` auf das MacBook übertragen:
+After the attack, the PCAP file was transferred from aegis-sentinel to MacBook via `scp`:
 
 ```bash
 scp aegis-siem@192.168.178.126:/tmp/ch03_full.pcap ~/Desktop/ch03_full.pcap
 ```
 
-Wireshark öffnet die Datei lokal auf dem MacBook zur forensischen Analyse.
+Wireshark opened the file locally on MacBook for offline forensic analysis.
 
 ---
 

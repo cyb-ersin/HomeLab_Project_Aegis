@@ -4,79 +4,81 @@
 
 ---
 
-## Was haben wir hier gemacht?
+## Overview
 
-In Ch.01 haben wir Angriffe **gesehen**. In Ch.02 haben wir sie **gestoppt**. In Ch.03 stellen wir eine andere Frage:
+In Ch.01 we **detected** attacks. In Ch.02 we **blocked** them. Ch.03 asks a different question:
 
-> *Wenn du nur die Netzwerkdaten hättest — kein SIEM, keine Logs — könntest du den Angriff trotzdem rekonstruieren?*
+> *If you only had the raw network traffic — no SIEM, no logs — could you still reconstruct what happened?*
 
-Die Antwort: **Ja.**
+The answer: **yes.**
 
-Wir haben den Angriff aus Ch.01/02 wiederholt, dabei den gesamten Traffic mit `tcpdump` aufgenommen und anschließend mit Wireshark forensisch analysiert. Das Ergebnis: Angreifer-IP, verwendete Tools, Angriffsmuster und sogar der erfolgreiche Login — alles aus dem PCAP rekonstruiert.
-
----
-
-## Lab Umgebung
-
-| Maschine | Rolle | OS | IP |
-|:---------|:------|:---|:---|
-| MacBook Pro | Analyse (Wireshark) | macOS | 192.168.178.122 |
-| Kali Laptop | Angreifer | Kali Linux | 192.168.178.129 |
-| aegis-sentinel VM | Capture Node | Ubuntu 24.04.4 | 192.168.178.126 |
+We replayed the Ch.01/02 attack scenario, captured all traffic with `tcpdump`, and analyzed it offline with Wireshark. The result: attacker IP, tools used, attack patterns, and even the successful login — all reconstructed from a single PCAP file.
 
 ---
 
-## Ablauf
+## Lab Environment
+
+| Machine | Role | OS | IP |
+|:--------|:-----|:---|:---|
+| MacBook Pro | Analysis (Wireshark) | macOS | 192.168.178.122 |
+| Kali Laptop | Attacker | Kali Linux | 192.168.178.129 |
+| aegis-sentinel VM | Capture Node | Ubuntu 24.04.4 LTS | 192.168.178.126 |
+
+**Network:** Wireless Access Point · 192.168.178.0/24
+
+---
+
+## What Happened
 
 ```
-aegis-sentinel: tcpdump startet → nimmt alles auf
+aegis-sentinel: tcpdump starts → captures everything
         ↓
-Kali: nmap -sS -A -T4     (SYN Scan)
-Kali: nmap -O             (OS Fingerprinting)
-Kali: nmap -sV            (Service Detection)
-Kali: hydra SSH           (Brute Force → Passwort: 1111 ✅)
+Kali: nmap -sS -A -T4     → SYN Scan
+Kali: nmap -O             → OS Fingerprinting
+Kali: nmap -sV            → Service Detection
+Kali: hydra SSH           → Brute Force → password: 1111 ✅
         ↓
-aegis-sentinel: tcpdump stoppt → 8936 Pakete gespeichert
+aegis-sentinel: tcpdump stops → 8936 packets saved
         ↓
-MacBook: Wireshark → PCAP analysieren
+MacBook: Wireshark → PCAP analysis
 ```
 
 ---
 
-## Was wir im PCAP beweisen konnten
+## What We Proved from the PCAP
 
-| Frage | Antwort | Beweis |
-|:------|:--------|:-------|
-| Wer hat angegriffen? | 192.168.178.129 | 89.2% aller Pakete |
-| Welches Tool? | nmap | Win=1024 + SSH-2.0-NmapNSE Banner |
-| Welcher Service? | SSH Port 22 | 2191 Pakete auf Port 22 |
-| Wie viele Versuche? | 3076 TCP Verbindungen | Statistics → Conversations |
-| War der Angriff erfolgreich? | Ja | Große verschlüsselte Pakete nach Key Exchange |
-| Wann geblockt? | T+390s | RST Pakete — fail2ban aus Ch.02 |
+| Question | Answer | Evidence |
+|:---------|:-------|:---------|
+| Who attacked? | 192.168.178.129 | 89.2% of all packets |
+| Which tool? | nmap | Win=1024 + SSH-2.0-NmapNSE banner |
+| Which service targeted? | SSH Port 22 | 2191 packets on Port 22 |
+| How many attempts? | 3076 TCP connections | Statistics → Conversations |
+| Was the attack successful? | Yes | Large encrypted packets after Key Exchange |
+| When was attacker blocked? | T+390s | RST packets — fail2ban from Ch.02 |
 
 ---
 
 ## MITRE ATT&CK
 
-| Technik | ID | Tool | Beweis im PCAP |
-|:--------|:---|:-----|:---------------|
-| Active Scanning | T1595 | nmap | SYN Flood, Win=1024 |
-| Active Scanning | T1595 | nmap -O | FIN+SYN+PSH+URG Flags |
-| Active Scanning | T1595 | nmap -sV | SSH-2.0-NmapNSE Banner |
-| Brute Force | T1110.001 | Hydra | Key Exchange Muster |
-| Valid Accounts | T1078 | Hydra | Aktive verschlüsselte Session |
+| Technique | ID | Tool | Evidence in PCAP |
+|:----------|:---|:-----|:-----------------|
+| Active Scanning | T1595 | nmap -sS | SYN flood, Win=1024 |
+| Active Scanning | T1595 | nmap -O | FIN+SYN+PSH+URG flags |
+| Active Scanning | T1595 | nmap -sV | SSH-2.0-NmapNSE banner |
+| Brute Force | T1110.001 | Hydra | Repeated Key Exchange pattern |
+| Valid Accounts | T1078 | Hydra | Active encrypted session |
 
 ---
 
-## Chapter Struktur
+## Chapter Structure
 
-| Ordner | Inhalt |
-|:-------|:-------|
-| [01-Architecture](01-Architecture/) | Lab Umgebung, Topologie, Capture Setup |
-| [02-Assets](02-Assets/) | Tools, PCAP Info, Wireshark Filter |
-| [03-Attack_Scenario](03-Attack_Scenario/) | Angriffsbefehle + Screenshots |
-| [04-Evidences](04-Evidences/) | Wireshark Screenshots + Analyse |
-| [05-LESSONS_LEARNED](05-LESSONS_LEARNED/) | Fehler, Lösungen, Erkenntnisse |
+| Folder | Content |
+|:-------|:--------|
+| [01-Architecture](01-Architecture/) | Lab environment, topology, capture setup |
+| [02-Assets](02-Assets/) | Tools, PCAP info, Wireshark filters |
+| [03-Attack_Scenario](03-Attack_Scenario/) | Attack commands + screenshots |
+| [04-Evidences](04-Evidences/) | Wireshark screenshots + analysis |
+| [05-LESSONS_LEARNED](05-LESSONS_LEARNED/) | Errors, solutions, key takeaways |
 
 ---
 
