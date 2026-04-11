@@ -1,0 +1,95 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" font-family="monospace">
+
+  <!-- Background -->
+  <rect width="800" height="500" fill="#0d1117" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="38" text-anchor="middle" fill="#58a6ff" font-size="16" font-weight="bold">Ch.03 — Network Forensics Lab · 192.168.178.0/24</text>
+
+  <!-- Access Point (center top) -->
+  <rect x="310" y="60" width="180" height="54" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="400" y="82" text-anchor="middle" fill="#8b949e" font-size="11">Wireless Access Point</text>
+  <text x="400" y="100" text-anchor="middle" fill="#f0f6fc" font-size="12" font-weight="bold">192.168.178.0/24</text>
+
+  <!-- Lines from AP -->
+  <line x1="280" y1="114" x2="140" y2="180" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <line x1="400" y1="114" x2="400" y2="180" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <line x1="520" y1="114" x2="660" y2="180" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+  <!-- MacBook (left) -->
+  <rect x="40" y="180" width="200" height="100" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="140" y="205" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="bold">💻 MacBook Pro</text>
+  <text x="140" y="223" text-anchor="middle" fill="#8b949e" font-size="10">192.168.178.122</text>
+  <text x="140" y="241" text-anchor="middle" fill="#3fb950" font-size="10">Wireshark</text>
+  <text x="140" y="257" text-anchor="middle" fill="#8b949e" font-size="10">Offline PCAP Analysis</text>
+
+  <!-- aegis-sentinel (center) -->
+  <rect x="300" y="180" width="200" height="100" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="400" y="205" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="bold">🛡️ aegis-sentinel</text>
+  <text x="400" y="223" text-anchor="middle" fill="#8b949e" font-size="10">192.168.178.126</text>
+  <text x="400" y="241" text-anchor="middle" fill="#3fb950" font-size="10">tcpdump → ch03_full.pcap</text>
+  <text x="400" y="257" text-anchor="middle" fill="#f85149" font-size="10">fail2ban + iptables (Ch.02)</text>
+
+  <!-- Kali (right) -->
+  <rect x="560" y="180" width="200" height="100" rx="8" fill="#161b22" stroke="#f85149" stroke-width="1.5"/>
+  <text x="660" y="205" text-anchor="middle" fill="#f85149" font-size="11" font-weight="bold">💀 Kali Laptop</text>
+  <text x="660" y="223" text-anchor="middle" fill="#8b949e" font-size="10">192.168.178.129</text>
+  <text x="660" y="241" text-anchor="middle" fill="#f85149" font-size="10">nmap · hydra</text>
+  <text x="660" y="257" text-anchor="middle" fill="#8b949e" font-size="10">Attacker</text>
+
+  <!-- Attack arrows from Kali to sentinel -->
+  <line x1="560" y1="230" x2="500" y2="230" stroke="#f85149" stroke-width="2" marker-end="url(#arrowRed)"/>
+
+  <!-- scp arrow from sentinel to MacBook -->
+  <line x1="300" y1="245" x2="240" y2="245" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowBlue)"/>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowRed" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#f85149"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#58a6ff"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#3fb950"/>
+    </marker>
+  </defs>
+
+  <!-- Attack labels -->
+  <text x="530" y="215" text-anchor="middle" fill="#f85149" font-size="9">nmap · hydra</text>
+
+  <!-- scp label -->
+  <text x="270" y="238" text-anchor="middle" fill="#58a6ff" font-size="9">scp PCAP</text>
+
+  <!-- Attack sequence box -->
+  <rect x="40" y="320" width="720" height="155" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="400" y="342" text-anchor="middle" fill="#8b949e" font-size="11" font-weight="bold">ATTACK SEQUENCE</text>
+
+  <!-- Steps -->
+  <rect x="60" y="352" width="150" height="50" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="1"/>
+  <text x="135" y="372" text-anchor="middle" fill="#f85149" font-size="10" font-weight="bold">① nmap -sS -A -T4</text>
+  <text x="135" y="388" text-anchor="middle" fill="#8b949e" font-size="9">SYN Scan</text>
+  <text x="135" y="400" text-anchor="middle" fill="#8b949e" font-size="9">T1595</text>
+
+  <rect x="225" y="352" width="150" height="50" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="1"/>
+  <text x="300" y="372" text-anchor="middle" fill="#f85149" font-size="10" font-weight="bold">② nmap -O</text>
+  <text x="300" y="388" text-anchor="middle" fill="#8b949e" font-size="9">OS Fingerprinting</text>
+  <text x="300" y="400" text-anchor="middle" fill="#8b949e" font-size="9">T1595</text>
+
+  <rect x="390" y="352" width="150" height="50" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="1"/>
+  <text x="465" y="372" text-anchor="middle" fill="#f85149" font-size="10" font-weight="bold">③ nmap -sV</text>
+  <text x="465" y="388" text-anchor="middle" fill="#8b949e" font-size="9">Service Detection</text>
+  <text x="465" y="400" text-anchor="middle" fill="#8b949e" font-size="9">T1595</text>
+
+  <rect x="555" y="352" width="185" height="50" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="1"/>
+  <text x="647" y="372" text-anchor="middle" fill="#f85149" font-size="10" font-weight="bold">④ hydra SSH</text>
+  <text x="647" y="388" text-anchor="middle" fill="#8b949e" font-size="9">Brute Force → pw: 1111</text>
+  <text x="647" y="400" text-anchor="middle" fill="#8b949e" font-size="9">T1110 → T1078</text>
+
+  <!-- Result bar -->
+  <rect x="60" y="415" width="680" height="44" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="1"/>
+  <text x="400" y="433" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="bold">tcpdump captured 8936 packets · ch03_full.pcap · Wireshark offline analysis on MacBook</text>
+  <text x="400" y="450" text-anchor="middle" fill="#8b949e" font-size="9">fail2ban (Ch.02) blocked Kali at T+390s → visible as RST packets in PCAP</text>
+
+</svg>

