@@ -1,203 +1,246 @@
 # 04 — Evidences
 
-## EV-01 — nmap SYN Scan Detected
+## EV-01 — tcpdump Capture Confirmation
 
-**Filter:** `tcp.flags.syn == 1 && tcp.flags.ack == 0`  
-**Result:** 3074 packets (34.4%)
+**Machine:** aegis-sentinel terminal
 
-![nmap SYN Scan](Bildschirmfoto%202026-04-11%20um%2013.19.56.png)
-
-**What we see:**
-- Source `192.168.178.129` (Kali) → all packets from the attacker
-- `Win=1024` → nmap fingerprint! Normal traffic uses `Win=64240`
-- SYN packets to hundreds of different ports in milliseconds → port scan confirmed
-
----
-
-## EV-02 — Win=1024 vs Win=64240
-
-![Win Size Comparison](Bildschirmfoto%202026-04-11%20um%2013.23.06.png)
-
-Two distinct patterns side by side:
-
-| Win Size | Tool | What it means |
-|:---------|:-----|:--------------|
-| `Win=1024` | nmap | Half-open scan — no real data transfer intended |
-| `Win=64240` | Hydra | Real connection — data will be exchanged |
-
----
-
-## EV-03 — SSH Traffic on Port 22
-
-**Filter:** `tcp.port == 22 && tcp.flags.syn == 1`  
-**Result:** 134 packets (1.5%)
-
-![SSH SYN Packets](Bildschirmfoto%202026-04-11%20um%2013.29.15.png)
-
-**What we see:**
-- `Win=1024` packets → nmap probing Port 22
-- `Win=64240` packets → Hydra building real SSH connections
-- Red lines `[FIN, SYN, PSH, URG]` → nmap OS fingerprinting probe — impossible in normal traffic
-
----
-
-## EV-04 — All SSH Traffic
-
-**Filter:** `tcp.port == 22`  
-**Result:** 2191 packets (24.5%)
-
-![All SSH Traffic](Bildschirmfoto%202026-04-11%20um%2013.36.55.png)
-
-Two sources visible:
-- `192.168.178.122` (MacBook) → legitimate admin SSH session
-- `192.168.178.129` (Kali) → attack traffic
-
-tcpdump captures **everything** — including your own connections. Analyst context is required to separate them.
-
----
-
-## EV-05 — MacBook SSH Session Identified
-
-![MacBook SSH Session](Bildschirmfoto%202026-04-11%20um%2013.38.08.png)
-
-`192.168.178.122` is the MacBook — not a threat. A SOC analyst must know the environment to separate legitimate from malicious traffic.
-
----
-
-## EV-06 — nmap SSH Banner (Smoking Gun)
-
-![nmap SSH Banner](Bildschirmfoto%202026-04-11%20um%2013.55.14.png)
+![tcpdump capture](Bildschirmfoto%202026-04-11%20um%2012.42.20.png)
 
 ```
-Client: Protocol (SSH-1.5-NmapNSE-1.0)
-Client: Protocol (SSH-1.5-Nmap-SSH1-Hostkey)
+tcpdump: listening on enp0s3, link-type EN10MB
+8936 packets captured · 8945 received · 0 dropped by kernel
+```
+
+Zero packet loss — forensic integrity confirmed. All attack traffic was recorded.
+
+---
+
+## EV-02 — nmap SYN Scan — 3074 Packets Detected
+
+**Filter:** `tcp.flags.syn == 1 && tcp.flags.ack == 0`
+
+![SYN scan 3074 packets](Bildschirmfoto%202026-04-11%20um%2013.19.56.png)
+
+3074 SYN packets, all from `192.168.178.129` (Kali) to `192.168.178.126` (aegis-sentinel). All show `Win=1024` — the nmap fingerprint. Normal traffic uses `Win=64240`.
+
+---
+
+## EV-03 — nmap Fingerprint: Win=1024 vs Win=64240
+
+**Filter:** `tcp.flags.syn == 1 && tcp.flags.ack == 0`
+
+![Win size fingerprint](Bildschirmfoto%202026-04-11%20um%2013.23.06.png)
+
+Two tools clearly visible:
+- `Win=1024` → nmap half-open scan packets
+- `Win=64240` → Hydra real SSH connection attempts
+- Red lines `[FIN, SYN, PSH, URG]` → nmap `-O` OS fingerprinting probe — this flag combination is physically impossible in normal traffic
+
+---
+
+## EV-04 — SSH Port 22 SYN Packets — 134 Packets
+
+**Filter:** `tcp.port == 22 && tcp.flags.syn == 1`
+
+![SSH SYN 134 packets](Bildschirmfoto%202026-04-11%20um%2013.29.15.png)
+
+134 packets (1.5%) — only Port 22 SYN traffic. Both nmap (`Win=1024`) and Hydra (`Win=64240`) visible in the same view. Red RST packets = fail2ban blocking Kali.
+
+---
+
+## EV-05 — MacBook Admin Session Identified
+
+**Filter:** `tcp.port == 22`
+
+![MacBook SSH session](Bildschirmfoto%202026-04-11%20um%2013.36.55.png)
+
+All traffic here comes from `192.168.178.122` — the MacBook admin SSH session. Completely legitimate. tcpdump records everything including admin connections. A SOC analyst must separate this from attack traffic using context.
+
+---
+
+## EV-06 — nmap Banner + RST + Hydra in One View
+
+**Filter:** `tcp.port == 22`
+
+![nmap banner RST Hydra](Bildschirmfoto%202026-04-11%20um%2013.38.08.png)
+
+Three things visible at once:
+- **Red RST lines** → fail2ban blocking Kali's connections
+- **Lines 2394–2395:** `SSH-1.5-NmapNSE-1.0` and `SSH-1.5-Nmap-SSH1-Hostkey` → nmap identifies itself in cleartext
+- **`Win=64240` SYN packets (lines 2382+)** → Hydra starting brute force after nmap scan
+
+---
+
+## EV-07 — Attacker Traffic Isolated — SYN Scan Pattern
+
+**Filter:** `ip.addr == 192.168.178.129`
+
+![Attacker SYN scan](Bildschirmfoto%202026-04-11%20um%2013.55.14.png)
+
+7970 packets (89.2%) from the attacker. SYN packets to hundreds of different ports with `Win=1024` — classic nmap port scan. One connection per port, rapid succession.
+
+---
+
+## EV-08 — OS Fingerprinting Artifacts
+
+**Filter:** `ip.addr == 192.168.178.129`
+
+![OS fingerprinting](Bildschirmfoto%202026-04-11%20um%2013.55.51.png)
+
+- **Red RST lines** → fail2ban blocking connections
+- **ICMP Echo request/reply** → nmap host discovery ping
+- **UDP line → ICMP Destination unreachable** → nmap probing closed UDP port
+- **`[FIN, SYN, PSH, URG]`** → nmap `-O` OS fingerprinting probe — impossible in normal traffic, unique nmap signature
+
+---
+
+## EV-09 — nmap SSH Service Detection Banner
+
+**Filter:** `ip.addr == 192.168.178.129`
+
+![nmap SSH service banner](Bildschirmfoto%202026-04-11%20um%2013.56.01.png)
+
+```
+Client: Protocol (SSH-2.0-Nmap-SSH2-Hostkey)
 Server: Protocol (SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.15)
 ```
 
-nmap identifies itself in **cleartext**. A SOC analyst seeing `NmapNSE` immediately knows: this is not a real SSH client.
+nmap `-sV` reads the full server banner. Server version `OpenSSH 9.6p1 Ubuntu` fully exposed — attacker now knows exact version for vulnerability research.
 
 ---
 
-## EV-07 — Attacker IP Isolated
+## EV-10 — Successful Login via Encrypted Packet Size
 
-**Filter:** `ip.addr == 192.168.178.129`  
-**Result:** 7970 packets (89.2%)
+**Filter:** `ip.addr == 192.168.178.129`
 
-![Attacker Traffic](Bildschirmfoto%202026-04-11%20um%2013.56.01.png)
+![Successful login](Bildschirmfoto%202026-04-11%20um%2013.56.31.png)
 
-89% of all captured traffic came from the attacker — clearly not normal behavior.
+After hundreds of failed short attempts, a persistent encrypted session appears:
+```
+Server: Diffie-Hellman Key Exchange Reply, New Keys (len=200)
+Client: Encrypted packet (len=44)
+Server: Encrypted packet (len=44)
+Server: Encrypted packet (len=264)
+```
+
+Ongoing bidirectional encrypted session = Hydra found password `1111`. Proven from packet behavior alone — no Hydra terminal output needed.
 
 ---
 
-## EV-08 — OS Fingerprinting + RST Packets
+## EV-11 — fail2ban Blocking at T+390s
 
-![OS Fingerprinting and RST](Bildschirmfoto%202026-04-11%20um%2013.56.48.png)
+**Filter:** `ip.addr == 192.168.178.129`
 
-**Red lines — RST packets:**
-```
-[RST] Win=0  → aegis-sentinel is blocking the connection (fail2ban from Ch.02!)
-```
+![fail2ban RST blocking](Bildschirmfoto%202026-04-11%20um%2013.56.48.png)
 
-**ICMP lines:**
 ```
-Echo request ttl=40  → nmap checks if host is alive
-Echo reply   ttl=64  → host responds
+46158 → 22 [RST] Seq=1260 Win=0 Len=0
+46188 → 22 [RST] Seq=1260 Win=0 Len=0
+ICMP: Destination unreachable (Port unreachable)
 ```
 
-**UDP line:**
-```
-ICMP Destination unreachable → port does not exist
-```
+fail2ban from Ch.02 still active — blocking Kali at packet level. Cross-chapter defense-in-depth confirmed in the PCAP.
 
 ---
 
-## EV-09 — nmap SSH Stream Isolated
+## EV-12 — nmap SSH Stream Isolated
 
 **Filter:** `tcp.stream eq 1017`
 
-![nmap Stream](Bildschirmfoto%202026-04-11%20um%2014.08.48.png)
+![nmap stream isolated](Bildschirmfoto%202026-04-11%20um%2014.08.48.png)
 
 Complete nmap SSH connection in one view:
 ```
-SYN          → connect request
-SYN-ACK      → port is open!
-Server Banner → OpenSSH 9.6p1 Ubuntu
-Client Banner → SSH-2.0-NmapNSE ← attacker identified!
-FIN          → immediately disconnects
+SYN → SYN-ACK → ACK
+Server: OpenSSH_9.6p1 Ubuntu banner
+Client: SSH-2.0-NmapNSE ← tool identified
+Client: Key Exchange Init
+Server: Key Exchange Init
+FIN-ACK → immediate disconnect
 ```
 
-nmap only needed the banner — connected and left in ~30ms.
+nmap grabbed the banner and disconnected in ~30ms. No authentication attempted.
 
 ---
 
-## EV-10 — Follow Stream — Cipher Suites
+## EV-13 — Follow Stream — Cipher Suites Exposed
 
-![Follow Stream](Bildschirmfoto%202026-04-11%20um%2014.11.54.png)
+**Filter:** `tcp.stream eq 1017` → Follow TCP Stream
 
-nmap reads all supported cipher suites from the server — complete encryption configuration exposed during reconnaissance.
+![Follow stream cipher suites](Bildschirmfoto%202026-04-11%20um%2014.11.54.png)
+
+```
+SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.15
+SSH-2.0-Nmap-SSH2-Hostkey
+[full cipher suite list...]
+```
+
+Complete server encryption capabilities exposed to attacker during reconnaissance phase.
 
 ---
 
-## EV-11 — Hydra Brute Force Pattern
+## EV-14 — Hydra Brute Force Pattern + Successful Login
 
-**Filter:** `tcp.port == 22 && tcp.len > 100`  
-**Result:** 123 packets (1.4%)
+**Filter:** `tcp.port == 22 && tcp.len > 100`
 
-![Hydra Key Exchange Pattern](Bildschirmfoto%202026-04-11%20um%2014.33.01.png)
+![Hydra key exchange pattern](Bildschirmfoto%202026-04-11%20um%2014.33.01.png)
 
-**Top section (repeating):**
+**Top (repeating — failed attempts):**
 ```
-Key Exchange Init (1042 bytes)  ← one password attempt
-ECDH Reply (558 bytes)          ← attempt failed
-Key Exchange Init (1042 bytes)  ← next attempt...
-```
-
-**Bottom section (unique):**
-```
-Encrypted packet (len=628)  ← large packet!
-Encrypted packet (len=528)  ← active session!
+Client: Key Exchange Init (1042 bytes)
+Server: Key Exchange Init (1186 bytes)
+Server: ECDH Reply (558 bytes) → failed → next attempt
 ```
 
-→ Password was found — active SSH session established.
+**Bottom (unique — successful login):**
+```
+Server: Encrypted packet (len=628)
+Client: Encrypted packet (len=528)
+Server: Encrypted packet (len=548)
+```
+
+Password found — active SSH session established.
 
 ---
 
-## EV-12 — Successful Login Confirmed
+## EV-15 — Conversations: MacBook Only (with filter)
 
-![Successful Login](Bildschirmfoto%202026-04-11%20um%2014.40.29.png)
+**Menu:** Statistics → Conversations → TCP (display filter active)
 
-After hundreds of short connections, suddenly a **long encrypted session** appears. Hydra is logged in. Provable from PCAP alone — no Hydra terminal output required.
+![Conversations MacBook only](Bildschirmfoto%202026-04-11%20um%2014.40.29.png)
+
+With filter applied: only 1 conversation visible — the MacBook admin SSH session (`192.168.178.122`). Shows how filters isolate specific traffic for clean analysis.
 
 ---
 
-## EV-13 — TCP Conversations — 3076 Total
+## EV-16 — Conversations: 3076 TCP Total (no filter)
 
-**Menu:** Statistics → Conversations → TCP
+**Menu:** Statistics → Conversations → TCP (no filter)
 
-![TCP Conversations](Bildschirmfoto%202026-04-11%20um%2014.49.03.png)
+![TCP Conversations 3076](Bildschirmfoto%202026-04-11%20um%2014.49.03.png)
 
-**3076 TCP connections — breakdown:**
-- Many ports, 1 connection each → nmap port scan (T1595)
+3076 total TCP conversations:
+- Many ports, 1–3 packets each → nmap port scan (T1595)
 - Port 22, many short connections → Hydra brute force (T1110)
-- Port 22, large data exchange → successful login (T1078)
+- Port 22, one long large-data connection → successful login (T1078)
 
 ---
 
-## EV-14 — I/O Graph — Full Attack Timeline
+## EV-17 — I/O Graph — Full Attack Timeline
 
 **Menu:** Statistics → I/O Graph
 
-![I/O Graph Timeline](Bildschirmfoto%202026-04-11%20um%2015.15.53.png)
+![I/O Graph attack timeline](Bildschirmfoto%202026-04-11%20um%2015.15.53.png)
 
 ```
-T+60s   → Peak 1 (~2000 pkt/s) → nmap -sS    SYN Scan
-T+100s  → Peak 2 (~2000 pkt/s) → nmap -O     OS Fingerprinting
-T+120s  → Peak 3 (~2000 pkt/s) → nmap -sV    Service Detection
-T+200s  → Peak 4 ( ~350 pkt/s) → Hydra       SSH Brute Force
-T+390s  → Red zone (TCP Errors) → fail2ban    Kali blocked!
+T+60s   → Peak 1 (~2000 pkt/s) → nmap -sS -A -T4   SYN Scan
+T+100s  → Peak 2 (~2000 pkt/s) → nmap -O            OS Fingerprinting
+T+120s  → Peak 3 (~2000 pkt/s) → nmap -sV           Service Detection
+T+200s  → Peak 4 ( ~350 pkt/s) → Hydra              SSH Brute Force
+T+390s  → Red TCP Error zone    → fail2ban            Kali IP blocked
 ```
 
-The entire attack timeline reconstructed — **no SIEM, no logs, packets only.**
+Entire attack timeline reconstructed from one PCAP file. No SIEM. No logs. Packets only.
 
 ---
 
