@@ -1,4 +1,4 @@
-# Ch.02 — Active Defense & Detection Engineering
+# Ch02_Active_Defense_Detection_Engineering
 
 **homelab_AEGIS** · SOC from Scratch · March 24, 2026
 
