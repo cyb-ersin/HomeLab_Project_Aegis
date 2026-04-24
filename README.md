@@ -88,7 +88,7 @@ homelab_AEGIS                   ← you are here
 ├── Ch.01  IDS Deployment & First Detection     ✅
 ├── Ch.02  Active Defense & Detection Eng.      ✅
 ├── Ch.03  Network Forensics & PCAP Analysis    ✅
-├── Ch.04  Exploitation & Detection             🔄 (jetzt)
+├── Ch.04  Exploitation & Detection             🔄 (next)
 ├── Ch.05  Lateral Movement                     🔜
 ├── Ch.06  Detection Rule Writing               🔜
 └── Ch.07  Incident Response                    🔜
