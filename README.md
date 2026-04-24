@@ -105,9 +105,9 @@ homelab_AEGIS                   ← you are here
 | Lateral Movement | Remote Services: SSH | T1021.004 | ✅ Ch.01/02 |
 | Initial Access | Valid Accounts | T1078 | ✅ Ch.01/02 |
 | Privilege Escalation | Sudo and Sudo Caching | T1548.003 | ✅ Ch.02 |
-| Initial Access | Exploit Public-Facing Application | T1190 | 🔜 Ch.03 |
-| Execution | Command and Scripting Interpreter | T1059 | 🔜 Ch.03 |
-| Collection | Network Sniffing | T1040 | 🔜 Ch.05 |
+| Collection | Network Sniffing | T1040 | ✅ Ch.03 |
+| Initial Access | Exploit Public-Facing Application | T1190 | 🔜 Ch.04 |
+| Execution | Command and Scripting Interpreter | T1059 | 🔜 Ch.04 |
 | Defense Evasion | Impair Defenses | T1562 | 🔜 Ch.06 |
 | Command & Control | Application Layer Protocol | T1071 | 🔜 Ch.05 |
 | Exfiltration | Exfiltration Over C2 Channel | T1041 | 🔜 Ch.05 |
