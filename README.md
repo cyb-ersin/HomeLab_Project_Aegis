@@ -12,7 +12,7 @@
 
 ## About
 
-`homelab_AEGIS` is the hands-on lab repository for **Project Aegis** — an advanced attack/defense series built on top of [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation).
+`homelab_AEGIS` is the hands-on lab repository for **Project Aegis** — an advanced attack/defense series built on top of [HomeLab_Foundation](https://github.com/cyb-ersin/HomeLab_Foundation).
 
 The scenario: a small organization with no existing security visibility. Starting from zero — no IDS, no SIEM, no incident response process. Each chapter builds one layer of the detection and response pipeline until the environment is fully instrumented.
 
