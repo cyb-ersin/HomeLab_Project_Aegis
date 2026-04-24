@@ -57,7 +57,7 @@ Complete [HomeLab_Foundation](https://github.com/cyb-ersin/HomeLab_Foundation)fi
 | # | Chapter | Scenario Question | Status |
 |:--|:--------|:------------------|:-------|
 | 01 | [IDS Deployment & First Detection](https://github.com/cyb-ersin/HomeLab_Project_Aegis/tree/main/Ch01_IDS_Deployment) | Can we detect a port scan and brute force in real time? | ✅ Complete |
-| 02 | [Active Defense & Detection Engineering](https://github.com/cyb-ersin/HomeLab_Project_Aegis/tree/main/Ch02%20%E2%80%94%20Active%20Defense%20%26%20Detection%20Engineering) | Can we automatically block an attacker — and detect it in the SIEM? | ✅ Complete |
+| 02 | [Active Defense & Detection Engineering](https://github.com/cyb-ersin/HomeLab_Project_Aegis/tree/main/Ch02_Active_Defense_Detection_Engineering)| Can we automatically block an attacker — and detect it in the SIEM? | ✅ Complete |
 | 03 | [Network Forensics & PCAP Analysis](https://github.com/cyb-ersin/HomeLab_Project_Aegis/tree/main/Ch03_Network_Forensics) | What does the attack look like on packet level? Can we reconstruct the timeline? | ✅ Complete  |
 | 04 | Exploitation & Detection | If Metasploit gets a shell — does the IDS see it? | 🔜 Planned |
 | 05 | Lateral Movement | Can SIEM detect movement between hosts post-compromise? | 🔜 Planned |
