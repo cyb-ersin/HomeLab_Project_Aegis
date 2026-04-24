@@ -42,7 +42,7 @@ The scenario: a small organization with no existing security visibility. Startin
 
 ## Prerequisites
 
-Complete [homelab-foundation](https://github.com/cyb-ersin/homelab-foundation) first:
+Complete [HomeLab_Foundation](https://github.com/cyb-ersin/HomeLab_Foundation)first:
 
 - ✅ Lab 0 — Network Discovery
 - ✅ Lab 1 — Wireshark Traffic Analysis
