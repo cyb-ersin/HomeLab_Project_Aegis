@@ -6,7 +6,7 @@
 ![Difficulty](https://img.shields.io/badge/Difficulty-Advanced-red)
 ![IDS](https://img.shields.io/badge/IDS-Suricata-orange)
 ![SIEM](https://img.shields.io/badge/SIEM-Wazuh-blue)
-![Certs](https://img.shields.io/badge/CompTIA-A%2B%20%7C%20Sec%2B-blue)
+![Certs](https://img.shields.io/badge/CompTIA-A%2B%20%7C%20Sec%2B%20%7C%20CySA%2B%20%7C%20CASP-blue)
 
 ---
 
