@@ -77,6 +77,8 @@ VirtualBox VM on core
 MacBook Pro
 macOS
 Management / Analysis / Hypervisor
+```
+---
 
 ---
 
