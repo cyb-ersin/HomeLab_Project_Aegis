@@ -77,3 +77,17 @@ VirtualBox VM on core
 MacBook Pro
 macOS
 Management / Analysis / Hypervisor
+
+---
+
+## Key Outcomes
+
+So far, Project AEGIS has demonstrated:
+
+- Built a Suricata → Wazuh detection pipeline from scratch
+- Detected and correlated network scanning and SSH brute-force activity
+- Implemented automated response and custom detection logic
+- Reconstructed an attack timeline from 8,936 captured packets
+- Established a permanent three-host architecture for continued SOC and Detection Engineering work
+
+These are validated milestones from completed AEGIS work, not planned capabilities.
