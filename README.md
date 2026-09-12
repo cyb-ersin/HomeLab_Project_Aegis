@@ -2,7 +2,8 @@
 
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![Series](https://img.shields.io/badge/Series-Project%20AEGIS-red)
-![Focus](https://img.shields.io/badge/Focus-SOC%20%7C%20Detection%20Engineering-blue)
+![Type](https://img.shields.io/badge/Type-SOC%20%2F%20Detection%20Lab-blue)
+![Difficulty](https://img.shields.io/badge/Difficulty-Advanced-red)
 ![IDS](https://img.shields.io/badge/IDS-Suricata-orange)
 ![SIEM](https://img.shields.io/badge/SIEM-Wazuh-blue)
 ![MITRE](https://img.shields.io/badge/MITRE-ATT%26CK-red)
@@ -11,49 +12,68 @@
 
 ## About
 
-**Project AEGIS** is my hands-on SOC and Detection Engineering home lab.
+**Project AEGIS** is an advanced hands-on SOC and Detection Engineering home lab built on top of
+[HomeLab_Foundation](https://github.com/cyb-ersin/HomeLab_Foundation).
 
-The project builds on the networking and security fundamentals developed in
-[HomeLab Foundation](https://github.com/cyb-ersin/HomeLab_Foundation).
+The project started with a simple question:
 
-The goal is not simply to generate attacks or collect screenshots.
+> How much security visibility can I build from scratch inside my own lab?
 
-The goal is to understand the complete defensive workflow:
+The goal is not simply to run attacks or collect screenshots.
+
+Each chapter builds another part of the defensive workflow:
 
 **traffic → telemetry → detection → correlation → investigation → response**
 
-Each chapter adds another layer to that process.
+The focus is on understanding what the tools actually see, validating detections with evidence, documenting failures, and improving the lab step by step.
 
 ---
 
-## Current Architecture
+## Scenario
 
-From Chapter 04 onward, Project AEGIS runs on a fixed three-host physical architecture.
+Project AEGIS simulates a small environment in which security visibility is gradually built from the ground up.
+
+The defender must be able to:
+
+- observe suspicious network activity
+- collect and centralize telemetry
+- detect reconnaissance and authentication attacks
+- correlate events in a SIEM
+- reconstruct activity from packet evidence
+- write and validate detection rules
+- investigate exploitation and post-compromise behavior
+- document detection gaps and hardening opportunities
+
+All offensive activity is performed only inside the owned and authorized lab environment.
+
+---
+
+## Current Lab Architecture
+
+From **Chapter 04 onward**, AEGIS runs on a fixed three-host physical architecture.
 
 ```text
-                     Project AEGIS
-
-      ☠ h4des
-      ThinkPad X250
-      Kali Linux
-      Controlled Test Host
-            │
-            │ controlled security testing
-            ▼
-      ◈ edge
-      Fujitsu Lifebook E554
-      Ubuntu 24.04 LTS
-      Sensor / Monitored Host
-            │
-            │ security telemetry
-            ▼
-      wazuh-server
-      Wazuh SIEM
-      VirtualBox VM
-            │
-            │ centralized analysis
-            ▼
-       core
-      MacBook Pro
-      macOS
-      Management / Analysis / Hypervisor
+☠ h4des
+ThinkPad X250
+Kali Linux
+Controlled Test Host
+      │
+      │ controlled lab traffic
+      ▼
+◈ edge
+Fujitsu Lifebook E554
+Ubuntu 24.04 LTS
+Sensor / Monitored Host
+      │
+      │ security telemetry
+      ▼
+wazuh-server
+Wazuh SIEM
+VirtualBox VM on core
+      │
+      │ centralized analysis
+      ▼
+ core
+MacBook Pro
+macOS
+Management / Analysis / Hypervisor
