@@ -54,3 +54,6 @@ The central Wazuh environment runs on `core` as a VirtualBox VM named:
 
 ```text
 Wazuh v4.14.4 OVA
+```
+
+The VM provides the central Wazuh Manager, Indexer and Dashboard for the AEGIS lab.
