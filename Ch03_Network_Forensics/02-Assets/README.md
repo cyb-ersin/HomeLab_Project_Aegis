@@ -28,7 +28,7 @@
 The password `111` is at **line 9845** in rockyou.txt:
 
 ```bash
-grep -n "^111$" /usr/share/wordlists/rockyou.txt
+grep -n "^passxxxx$" /usr/share/wordlists/rockyou.txt
 # Output: 9845
 ```
 
