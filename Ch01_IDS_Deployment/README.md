@@ -147,12 +147,12 @@ data.src_ip:      172.20.10.4  |  data.proto: ICMP  |  data.icmp_code: 9
 ## Phase 4 — Attack Simulation #2: SSH Brute Force
 
 ```bash
-hydra -l aegis-siem -P /usr/share/wordlists/rockyou.txt -t 4 ssh://172.20.10.6
+hydra -l user -P /usr/share/wordlists/rockyou.txt -t 4 ssh://172.20.10.6
 ```
 
 **Result:**
 ```
-[22][ssh] host: 172.20.10.6   login: aegis-siem   password: qwerty
+[22][ssh] host: 172.20.10.6   login: user   password: passxxxx
 1 of 1 target successfully completed, 1 valid password found
 ```
 
@@ -205,7 +205,7 @@ rule.mitre.tactic: Defense Evasion, Persistence, Privilege Escalation, Initial A
 
 | # | Finding | Severity | Status |
 |:--|:--------|:---------|:-------|
-| 1 | Weak SSH password — `qwerty` cracked in under 2 minutes | High | ⚠️ Mitigate |
+| 1 | Weak SSH password — `passxxxx` cracked in under 2 minutes | High | ⚠️ Mitigate |
 | 2 | Root SSH login blocked — `PermitRootLogin prohibit-password` | — | ✅ Hardened |
 | 3 | IDS in passive mode — attacks detected but not blocked | Medium | ⚠️ Mitigate |
 | 4 | Compliance violations auto-flagged — GDPR, PCI DSS, HIPAA, NIST | — | ✅ Working |
