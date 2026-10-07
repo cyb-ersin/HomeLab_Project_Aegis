@@ -14,7 +14,7 @@
 
 ### Finding 1 — Weak SSH Password
 
-**Issue:** User `aegis-siem` had password `qwerty` — position ~491 in rockyou.txt. Cracked in under 2 minutes with `-t 4`.
+**Issue:** User `user` had password `passxxxx` — position ~491 in rockyou.txt. Cracked in under 2 minutes with `-t 4`.
 
 **Mitigation:**
 - Enforce strong password policy (minimum 12 chars, mixed case, special characters)
