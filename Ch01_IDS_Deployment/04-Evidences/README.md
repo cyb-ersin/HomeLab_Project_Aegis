@@ -58,7 +58,7 @@ Top groups: authentication_failed, sshd, access_control, pam
 | Field | Value |
 |:------|:------|
 | `data.srcip` | 172.20.10.8 (Kali) |
-| `data.dstuser` | aegis-siem |
+| `data.dstuser` | user |
 | `rule.firedtimes` | 856 |
 | `rule.mitre.id` | T1110.001, T1021.004 |
 | `rule.mitre.tactic` | Credential Access, Lateral Movement |
@@ -92,7 +92,7 @@ After password was found, Wazuh captured the successful authentication — the m
 ![Hydra found password and SSH login](03_hydra_found_password_ssh_login.png)
 
 ```
-[22][ssh] host: 172.20.10.6   login: aegis-siem   password: qwerty
+[22][ssh] host: 172.20.10.6   login: user   password: passxxxxx
 1 of 1 target successfully completed
 ```
 
