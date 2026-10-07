@@ -123,7 +123,7 @@ Server: Encrypted packet (len=44)
 Server: Encrypted packet (len=264)
 ```
 
-Ongoing bidirectional encrypted session = Hydra found password `1111`. Proven from packet behavior alone — no Hydra terminal output needed.
+Ongoing bidirectional encrypted session = Hydra found password `passxxxx`. Proven from packet behavior alone — no Hydra terminal output needed.
 
 ---
 
