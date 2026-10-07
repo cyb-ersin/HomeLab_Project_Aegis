@@ -88,7 +88,7 @@ wazuh-analysisd: CRITICAL: Configuration error at 'etc/decoders/local_decoder.xm
 
 | Finding | Mitigation |
 |:--------|:-----------|
-| Weak SSH password (`qwerty`) | Change to strong password or disable password auth entirely — use SSH keys |
+| Weak SSH password (`passxxxx`) | Change to strong password or disable password auth entirely — use SSH keys |
 | Active Response timeout (300s) | In production, increase to 3600s+ or implement permanent ban with analyst review |
 | sudo alert volume high | Expected in lab — in production, filter noise with alert tuning |
 | DHCP instability (Wazuh Agent IP) | Assign static IP to aegis-sentinel to prevent agent connectivity drops |
